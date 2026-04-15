@@ -47,4 +47,27 @@ describe('Critério 1 – UAR', () => {
     expect(logic.getSpecialUAR('9100800')).toEqual({ ca: 'F1407000', descUP: 'INFRA ESTRUTURA PARA ENERGIZAÇÃO ELÉTRICA' });
     expect(logic.getSpecialUAR('0100001')).toBeNull();
   });
+
+  test('formatUAR: retorna vazio para inputs inválidos', () => {
+    expect(logic.formatUAR(null)).toBe('');
+    expect(logic.formatUAR(undefined)).toBe('');
+    expect(logic.formatUAR('abc')).toBe('');
+    expect(logic.formatUAR(-1)).toBe('');
+  });
+
+  test('getUP: retorna vazio para input inválido', () => {
+    expect(logic.getUP('')).toBe('');
+    expect(logic.getUP(null)).toBe('');
+    expect(logic.getUP('123')).toBe('');
+  });
+
+  test('getDescUAR: retorna vazio para array inválido', () => {
+    expect(logic.getDescUAR('0100001', null)).toBe('');
+    expect(logic.getDescUAR('0100001', undefined)).toBe('');
+  });
+
+  test('getDescUPFromDepara: retorna vazio para array inválido', () => {
+    expect(logic.getDescUPFromDepara(1, null)).toBe('');
+    expect(logic.getDescUPFromDepara(1, undefined)).toBe('');
+  });
 });
