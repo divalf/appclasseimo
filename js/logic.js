@@ -66,6 +66,67 @@ function getSpecialUAR(uar7) {
   return SPECIAL_UARS[uar7] || null;
 }
 
+/**
+ * Extrai CL: 7º caractere do Centro de Lucro do CC.
+ * @param {string} cc
+ * @param {Array} ccData
+ * @returns {string} 'A', 'E', 'G', '0', ou ''
+ */
+function getCL(cc, ccData) {
+  if (!Array.isArray(ccData)) return '';
+  const row = ccData.find(r => r.cc === cc);
+  if (!row) return '';
+  const cl = String(row.centroLucro);
+  return cl.length >= 7 ? cl[6] : '';
+}
+
+/**
+ * Mapeia CL para sua descrição.
+ * @param {string} cl
+ * @returns {string}
+ */
+function getDescCL(cl) {
+  const map = { 'A': 'Água', 'E': 'Esgoto', 'G': 'Geral', '0': 'Imobilizado' };
+  return map[cl] || '';
+}
+
+/**
+ * Retorna o Tipo de Contrato (TC) do CC.
+ * @param {string} cc
+ * @param {Array} ccData
+ * @returns {string} 'U', 'O', ou ''
+ */
+function getTC(cc, ccData) {
+  if (!Array.isArray(ccData)) return '';
+  const row = ccData.find(r => r.cc === cc);
+  return row ? row.tipoContrato : '';
+}
+
+/**
+ * Mapeia TC para sua descrição.
+ * @param {string} tc
+ * @returns {string} 'URAE', 'Outros', ou ''
+ */
+function getDescTC(tc) {
+  const map = { 'U': 'URAE', 'O': 'Outros' };
+  return map[tc] || '';
+}
+
+/**
+ * Retorna a descrição do CC (DescCC).
+ * @param {string} cc
+ * @param {Array} ccData
+ * @returns {string}
+ */
+function getDescCC(cc, ccData) {
+  if (!Array.isArray(ccData)) return '';
+  const row = ccData.find(r => r.cc === cc);
+  return row ? row.descCC : '';
+}
+
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { formatUAR, getUP, getDescUAR, getDescUPFromDepara, getSpecialUAR };
+  module.exports = {
+    formatUAR, getUP, getDescUAR, getDescUPFromDepara, getSpecialUAR,
+    getCL, getDescCL, getTC, getDescTC, getDescCC,
+  };
 }

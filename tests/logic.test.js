@@ -71,3 +71,49 @@ describe('Critério 1 – UAR', () => {
     expect(logic.getDescUPFromDepara(1, undefined)).toBe('');
   });
 });
+
+const CC_SAMPLE = [
+  { cc: '1000000000', responsavel: 'CARLOS AUGUSTO', tipoContrato: 'O', tipoCentroCusto: 'N', centroLucro: '1000000000', descCC: 'PRESIDÊNCIA', usuarioResponsavel: '131749' },
+  { cc: '5100300100', responsavel: 'JOSE SILVA',     tipoContrato: 'U', tipoCentroCusto: 'L', centroLucro: '510000A100', descCC: 'PPP ALTO TIETÊ', usuarioResponsavel: '45678' },
+  { cc: '5121001100', responsavel: 'MARIA COSTA',    tipoContrato: 'U', tipoCentroCusto: 'E', centroLucro: '510000A100', descCC: 'ETA ALTO COTIA', usuarioResponsavel: '12345' },
+];
+
+describe('Critério 2 – Centro de Custo', () => {
+  test('getCL: extrai o 7º caractere do Centro de Lucro', () => {
+    expect(logic.getCL('1000000000', CC_SAMPLE)).toBe('0');
+    expect(logic.getCL('5100300100', CC_SAMPLE)).toBe('A');
+    expect(logic.getCL('9999999999', CC_SAMPLE)).toBe('');
+  });
+
+  test('getDescCL: mapeia CL para descrição', () => {
+    expect(logic.getDescCL('A')).toBe('Água');
+    expect(logic.getDescCL('E')).toBe('Esgoto');
+    expect(logic.getDescCL('G')).toBe('Geral');
+    expect(logic.getDescCL('0')).toBe('Imobilizado');
+    expect(logic.getDescCL('X')).toBe('');
+  });
+
+  test('getTC: retorna Tipo de Contrato do CC', () => {
+    expect(logic.getTC('1000000000', CC_SAMPLE)).toBe('O');
+    expect(logic.getTC('5100300100', CC_SAMPLE)).toBe('U');
+    expect(logic.getTC('9999999999', CC_SAMPLE)).toBe('');
+  });
+
+  test('getDescTC: mapeia TC para descrição', () => {
+    expect(logic.getDescTC('U')).toBe('URAE');
+    expect(logic.getDescTC('O')).toBe('Outros');
+    expect(logic.getDescTC('X')).toBe('');
+  });
+
+  test('getDescCC: retorna descrição do CC', () => {
+    expect(logic.getDescCC('1000000000', CC_SAMPLE)).toBe('PRESIDÊNCIA');
+    expect(logic.getDescCC('5100300100', CC_SAMPLE)).toBe('PPP ALTO TIETÊ');
+    expect(logic.getDescCC('9999999999', CC_SAMPLE)).toBe('');
+  });
+
+  test('getCL: retorna vazio para centroLucro curto ou ausente', () => {
+    const badCC = [{ cc: '1111111111', centroLucro: 'ABC' }];
+    expect(logic.getCL('1111111111', badCC)).toBe('');
+    expect(logic.getCL('1111111111', null)).toBe('');
+  });
+});
