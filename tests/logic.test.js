@@ -190,3 +190,92 @@ describe('Critério 4 – Definição Prévia de CA', () => {
     expect(logic.getCA('0', 'O', '-', 1, null)).toBeNull();
   });
 });
+
+describe('Critério 5 – Validações', () => {
+  const incompativel = { ca: 'Incompatível', descUP: 'UAR Incompatível com o Centro de Custo' };
+
+  test('UP=10 com CL!=A deve ser incompatível', () => {
+    expect(logic.validate('1000001', '10', 'E')).toEqual(incompativel);
+    expect(logic.validate('1000001', '10', 'G')).toEqual(incompativel);
+    expect(logic.validate('1000001', '10', '0')).toEqual(incompativel);
+  });
+
+  test('UP=10 com CL=A não é incompatível', () => {
+    expect(logic.validate('1000001', '10', 'A')).toBeNull();
+  });
+
+  test('UAR=1100001 com CL!=A deve ser incompatível', () => {
+    expect(logic.validate('1100001', '11', 'E')).toEqual(incompativel);
+    expect(logic.validate('1100001', '11', '0')).toEqual(incompativel);
+  });
+
+  test('UAR=1100001 com CL=A não é incompatível', () => {
+    expect(logic.validate('1100001', '11', 'A')).toBeNull();
+  });
+
+  test('UAR=1100003 com CL!=E deve ser incompatível', () => {
+    expect(logic.validate('1100003', '11', 'A')).toEqual(incompativel);
+    expect(logic.validate('1100003', '11', '0')).toEqual(incompativel);
+  });
+
+  test('UAR=1100003 com CL=E não é incompatível', () => {
+    expect(logic.validate('1100003', '11', 'E')).toBeNull();
+  });
+
+  test('UP=02 com CL=0 deve ser incompatível', () => {
+    expect(logic.validate('0200007', '02', '0')).toEqual(incompativel);
+  });
+
+  test('UP=04 com CL=0 deve ser incompatível', () => {
+    expect(logic.validate('0400001', '04', '0')).toEqual(incompativel);
+  });
+
+  test('UP=07 com CL=0 deve ser incompatível', () => {
+    expect(logic.validate('0700001', '07', '0')).toEqual(incompativel);
+  });
+
+  test('UAR=0800221 com CL!=A deve ser incompatível', () => {
+    expect(logic.validate('0800221', '08', 'E')).toEqual(incompativel);
+  });
+
+  test('UAR=0800585 com CL!=A deve ser incompatível', () => {
+    expect(logic.validate('0800585', '08', 'G')).toEqual(incompativel);
+  });
+
+  test('UAR=0800103 com CL!=E deve ser incompatível', () => {
+    expect(logic.validate('0800103', '08', 'A')).toEqual(incompativel);
+  });
+
+  test('UAR=0800166 com CL!=E deve ser incompatível', () => {
+    expect(logic.validate('0800166', '08', 'G')).toEqual(incompativel);
+  });
+
+  test('UAR=0905902 com CL!=E deve ser incompatível', () => {
+    expect(logic.validate('0905902', '09', 'A')).toEqual(incompativel);
+  });
+
+  test('UAR=0926730 com CL!=E deve ser incompatível', () => {
+    expect(logic.validate('0926730', '09', '0')).toEqual(incompativel);
+  });
+
+  test('UAR=0200064 com CL!=E deve ser incompatível', () => {
+    expect(logic.validate('0200064', '02', 'A')).toEqual(incompativel);
+  });
+
+  test('UAR=0800080 com CL!=E deve ser incompatível', () => {
+    expect(logic.validate('0800080', '08', 'G')).toEqual(incompativel);
+  });
+
+  test('UAR=0800111 com CL!=E deve ser incompatível', () => {
+    expect(logic.validate('0800111', '08', 'A')).toEqual(incompativel);
+  });
+
+  test('UAR=0922100 com CL!=A deve ser incompatível', () => {
+    expect(logic.validate('0922100', '09', 'E')).toEqual(incompativel);
+  });
+
+  test('UAR normal sem conflito retorna null', () => {
+    expect(logic.validate('0100001', '01', 'A')).toBeNull();
+    expect(logic.validate('0100001', '01', '0')).toBeNull();
+  });
+});

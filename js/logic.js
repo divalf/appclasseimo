@@ -187,10 +187,39 @@ function getCA(cl, tc, tcc, upNum, deparaData) {
   return null;
 }
 
+const INCOMPATIVEL = { ca: 'Incompatível', descUP: 'UAR Incompatível com o Centro de Custo' };
+
+/**
+ * Verifica regras de incompatibilidade entre UAR/UP e CL (Critério 5).
+ * Retorna INCOMPATIVEL se houver conflito, ou null se válido.
+ *
+ * @param {string} uar7 - UAR formatada 7 dígitos
+ * @param {string} up   - UP (2 chars), ex: '01', '10'
+ * @param {string} cl   - CL ('A','E','G','0')
+ * @returns {{ ca: string, descUP: string } | null}
+ */
+function validate(uar7, up, cl) {
+  // UP=10 exige CL=A
+  if (up === '10' && cl !== 'A') return INCOMPATIVEL;
+
+  // UAR específicas que exigem CL=A
+  const requireA = ['1100001', '0800221', '0800585', '0922100'];
+  if (requireA.includes(uar7) && cl !== 'A') return INCOMPATIVEL;
+
+  // UAR específicas que exigem CL=E
+  const requireE = ['1100003', '0800103', '0800166', '0905902', '0926730', '0200064', '0800080', '0800111'];
+  if (requireE.includes(uar7) && cl !== 'E') return INCOMPATIVEL;
+
+  // UP=02, 04, 07 são incompatíveis com CL=0
+  if (['02', '04', '07'].includes(up) && cl === '0') return INCOMPATIVEL;
+
+  return null;
+}
+
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     formatUAR, getUP, getDescUAR, getDescUPFromDepara, getSpecialUAR,
     getCL, getDescCL, getTC, getDescTC, getDescCC,
-    getTCC, getCA,
+    getTCC, getCA, validate,
   };
 }
