@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Definir a Classe do Ativo</title>
+  <link rel="stylesheet" href="css/style-v2.css">
+</head>
+<body>
+  <div class="v2-page">
+    <div class="v2-card">
+
+      <!-- ── HEADER ── -->
+      <header class="v2-header">
+
+        <!-- Logo esquerda -->
+        <div class="v2-logo">
+          <svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+            <path d="M30 5 C14 5 5 16 5 28 C5 36 10 42 18 45 C14 48 12 52 14 56 C20 52 26 50 30 50 C44 50 55 40 55 28 C55 16 46 5 30 5 Z" fill="#0077b6" opacity="0.9"/>
+            <path d="M22 18 C18 22 18 30 22 34 C26 38 34 38 38 34 C42 30 42 22 38 18" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+            <path d="M20 26 C24 22 36 22 40 26" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+          </svg>
+        </div>
+
+        <!-- Título -->
+        <h1 class="v2-title">Definir a Classe do Ativo</h1>
+
+        <!-- Círculos decorativos -->
+        <div class="v2-decor">
+          <div class="v2-circle v2-circle-yellow"></div>
+          <div class="v2-circle v2-circle-green"></div>
+        </div>
+
+      </header>
+
+      <!-- ── ALERTA INCOMPATÍVEL ── -->
+      <div id="result-incompativel" class="v2-alert" style="display:none">
+        &#9888; UAR Incompatível com o Centro de Custo
+      </div>
+
+      <!-- ── CORPO ── -->
+      <div class="v2-body">
+
+        <!-- Seção 1: Entradas -->
+        <section class="v2-inputs">
+
+          <!-- Centro de Custo -->
+          <div class="v2-row">
+            <span class="v2-label">Centro de Custo:</span>
+            <div class="v2-input-wrap">
+              <input type="text" id="cc-input" list="cc-list"
+                     class="v2-input-yellow" autocomplete="off"
+                     placeholder="Cole ou digite o CC..." />
+              <datalist id="cc-list"></datalist>
+            </div>
+            <span class="v2-desc-out" id="cc-desc"></span>
+          </div>
+
+          <!-- UAR -->
+          <div class="v2-row">
+            <span class="v2-label">UAR:</span>
+            <div class="v2-input-wrap">
+              <input type="text" id="uar-input" list="uar-list"
+                     class="v2-input-yellow" autocomplete="off"
+                     placeholder="Cole ou digite a UAR..." />
+              <datalist id="uar-list"></datalist>
+            </div>
+            <span class="v2-desc-out" id="uar-desc"></span>
+          </div>
+
+          <!-- Tipo de Contrato -->
+          <div class="v2-row">
+            <span class="v2-label">Tipo de Contrato:</span>
+            <span class="v2-val" id="res-tc">—</span>
+            <span class="v2-desc-out" id="res-desctc">—</span>
+          </div>
+
+          <!-- Tipo Centro Custo -->
+          <div class="v2-row">
+            <span class="v2-label">Tipo Centro Custo:</span>
+            <span class="v2-val" id="res-tcc">—</span>
+            <span class="v2-desc-out" id="res-desctcc">—</span>
+          </div>
+
+          <!-- Centro de Lucro -->
+          <div class="v2-row v2-row-last">
+            <span class="v2-label">Centro de Lucro:</span>
+            <span class="v2-val" id="res-cl">—</span>
+            <span class="v2-desc-out" id="res-desccl">—</span>
+          </div>
+
+          <!-- Botão -->
+          <div class="v2-btn-row">
+            <button id="btn-calcular" type="button" class="v2-btn">
+              Determinar Classe
+            </button>
+          </div>
+
+        </section>
+
+        <!-- Seção 2: FC / Grupo de Bens / UM -->
+        <section class="v2-fg-section">
+          <div class="v2-fg-header">Forma de Controle</div>
+          <div class="v2-fg-header">Grupo de Bens</div>
+          <div class="v2-fg-header v2-no-right">Unidade de Medida</div>
+          <div class="v2-fg-value" id="res-fc">—</div>
+          <div class="v2-fg-value" id="res-gb">—</div>
+          <div class="v2-fg-value v2-no-right" id="res-um">—</div>
+        </section>
+
+        <!-- Seção 3: Classe do Ativo / Descrição -->
+        <section class="v2-ca-section">
+
+          <div class="v2-ca-col-left">
+            <div class="v2-ca-header">Classe do Ativo</div>
+            <div class="v2-ca-box" id="res-ca">—</div>
+          </div>
+
+          <div class="v2-ca-col-right">
+            <div class="v2-ca-header">Descrição Classe do Ativo Imobilizado</div>
+            <div class="v2-ca-desc" id="res-descup">—</div>
+          </div>
+
+        </section>
+
+        <!-- Seção 4: Ajuda + Matrícula / Nome Aprovador -->
+        <section class="v2-bottom-section">
+
+          <div class="v2-ajuda-col">
+            <span class="v2-ajuda-text">Ajuda</span>
+          </div>
+
+          <div class="v2-mat-col">
+            <div class="v2-mat-header">Matrícula</div>
+            <div class="v2-mat-header v2-no-right">Nome do Aprovador</div>
+            <div class="v2-mat-value" id="res-mat">—</div>
+            <div class="v2-mat-value v2-no-right" id="res-nomeaprov">—</div>
+          </div>
+
+          <!-- Logo rodapé direita -->
+          <div class="v2-footer-logo">
+            <svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg" width="36" height="36" opacity="0.35">
+              <path d="M30 5 C14 5 5 16 5 28 C5 36 10 42 18 45 C14 48 12 52 14 56 C20 52 26 50 30 50 C44 50 55 40 55 28 C55 16 46 5 30 5 Z" fill="#0077b6"/>
+              <path d="M22 18 C18 22 18 30 22 34 C26 38 34 38 38 34 C42 30 42 22 38 18" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+              <path d="M20 26 C24 22 36 22 40 26" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+            </svg>
+          </div>
+
+        </section>
+
+      </div><!-- /v2-body -->
+    </div><!-- /v2-card -->
+  </div><!-- /v2-page -->
+
+  <script src="js/data.js"></script>
+  <script src="js/logic.js"></script>
+  <script src="js/app-v2.js"></script>
+</body>
+</html>

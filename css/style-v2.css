@@ -1,0 +1,388 @@
+/* =====================================================
+   style-v2.css — APP Classe IMO (Versão 2)
+   Layout baseado no modelo de referência
+   ===================================================== */
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: #d8e4ed;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+}
+
+/* ── Página / Card ──────────────────────────────────── */
+
+.v2-page {
+  width: 100%;
+  max-width: 860px;
+}
+
+.v2-card {
+  background: #fff;
+  border: 2px solid #1a3a5c;
+  border-left: 8px solid #00b4d8;
+  border-radius: 2px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+
+/* ── Header ─────────────────────────────────────────── */
+
+.v2-header {
+  display: flex;
+  align-items: center;
+  padding: 10px 16px 10px 12px;
+  border-bottom: 2px solid #1a3a5c;
+  background: #fff;
+  min-height: 76px;
+  position: relative;
+}
+
+.v2-logo {
+  width: 64px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.v2-logo svg {
+  width: 56px;
+  height: 56px;
+}
+
+.v2-title {
+  flex: 1;
+  text-align: center;
+  font-size: 1.65rem;
+  font-weight: 900;
+  color: #00b4d8;
+  letter-spacing: 0.01em;
+  line-height: 1.2;
+  padding: 0 12px;
+}
+
+/* Círculos decorativos */
+.v2-decor {
+  width: 80px;
+  height: 64px;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.v2-circle {
+  position: absolute;
+  border-radius: 50%;
+}
+
+.v2-circle-yellow {
+  width: 58px;
+  height: 58px;
+  background: #ffd700;
+  top: 0;
+  right: 0;
+}
+
+.v2-circle-green {
+  width: 44px;
+  height: 44px;
+  background: #2ecc71;
+  bottom: 0;
+  right: 28px;
+}
+
+/* ── Alerta incompatível ─────────────────────────────── */
+
+.v2-alert {
+  background: #fff0f0;
+  border-bottom: 2px solid #c0392b;
+  color: #c0392b;
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 9px 16px;
+  letter-spacing: 0.02em;
+}
+
+/* ── Corpo ───────────────────────────────────────────── */
+
+.v2-body {
+  /* nada — as seções têm suas próprias bordas */
+}
+
+/* ── Seção 1: Entradas ───────────────────────────────── */
+
+.v2-inputs {
+  border-bottom: 2px solid #1a3a5c;
+}
+
+/* Linha genérica: label | value | desc */
+.v2-row {
+  display: grid;
+  grid-template-columns: 172px 130px 1fr;
+  align-items: center;
+  border-bottom: 1px solid #c8d4e0;
+  min-height: 38px;
+}
+
+.v2-row-last {
+  border-bottom: none;
+}
+
+.v2-label {
+  padding: 6px 10px 6px 14px;
+  font-weight: 700;
+  font-size: 0.875rem;
+  color: #1a1a2e;
+  white-space: nowrap;
+}
+
+/* Input com fundo amarelo (CC e UAR) */
+.v2-input-wrap {
+  padding: 3px 6px;
+}
+
+.v2-input-yellow {
+  width: 100%;
+  background: #ffff00;
+  border: 1.5px solid #b0b000;
+  padding: 4px 7px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  outline: none;
+  border-radius: 2px;
+}
+
+.v2-input-yellow:focus {
+  border-color: #00b4d8;
+  box-shadow: 0 0 0 2px rgba(0,180,216,0.2);
+}
+
+/* Valores derivados (TC, TCC, CL) */
+.v2-val {
+  padding: 6px 10px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #1a1a2e;
+}
+
+/* Descrições dos valores (vermelho) */
+.v2-desc-out {
+  padding: 6px 12px;
+  font-weight: 700;
+  font-size: 0.875rem;
+  color: #c0392b;
+  word-break: break-word;
+}
+
+/* Botão de calcular */
+.v2-btn-row {
+  padding: 10px 14px;
+  border-top: 1px solid #c8d4e0;
+}
+
+.v2-btn {
+  background: #1a3a5c;
+  color: #fff;
+  border: none;
+  padding: 9px 28px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: background 0.2s;
+}
+
+.v2-btn:hover {
+  background: #00b4d8;
+}
+
+/* ── Seção 2: FC / Grupo de Bens / UM ───────────────── */
+
+.v2-fg-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: auto auto;
+  border-bottom: 2px solid #1a3a5c;
+}
+
+.v2-fg-header {
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: #1a1a2e;
+  text-align: center;
+  padding: 8px 10px;
+  border-bottom: 1px solid #1a3a5c;
+  border-right: 1px solid #1a3a5c;
+}
+
+.v2-fg-value {
+  font-weight: 700;
+  font-size: 1rem;
+  color: #c0392b;
+  text-align: center;
+  padding: 9px 10px;
+  border-right: 1px solid #c8d4e0;
+}
+
+.v2-no-right {
+  border-right: none !important;
+}
+
+/* ── Seção 3: Classe do Ativo ────────────────────────── */
+
+.v2-ca-section {
+  display: grid;
+  grid-template-columns: 30% 70%;
+  border-bottom: 2px solid #1a3a5c;
+}
+
+.v2-ca-col-left {
+  border-right: 1px solid #1a3a5c;
+  display: flex;
+  flex-direction: column;
+}
+
+.v2-ca-col-right {
+  display: flex;
+  flex-direction: column;
+}
+
+.v2-ca-header {
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: #1a1a2e;
+  padding: 8px 12px;
+  border-bottom: 1px solid #1a3a5c;
+  text-align: center;
+}
+
+.v2-ca-box {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #1a4a6e;
+  color: #fff;
+  font-size: 1.35rem;
+  font-weight: 900;
+  padding: 14px 10px;
+  border: 4px solid #ffd700;
+  margin: 8px;
+  border-radius: 4px;
+  min-height: 58px;
+  text-align: center;
+  word-break: break-all;
+  letter-spacing: 0.04em;
+  transition: background 0.2s;
+}
+
+.v2-ca-box.incompativel {
+  background: #7b1a1a;
+  border-color: #c0392b;
+  color: #ffd0d0;
+}
+
+.v2-ca-desc {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  font-weight: 700;
+  font-size: 1rem;
+  color: #c0392b;
+  word-break: break-word;
+  min-height: 58px;
+}
+
+/* ── Seção 4: Rodapé (Ajuda + Mat/Nome) ─────────────── */
+
+.v2-bottom-section {
+  display: grid;
+  grid-template-columns: 30% 1fr auto;
+  min-height: 80px;
+  position: relative;
+}
+
+.v2-ajuda-col {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid #1a3a5c;
+}
+
+.v2-ajuda-text {
+  color: #00b4d8;
+  font-size: 1.15rem;
+  font-weight: 800;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  transition: color 0.2s;
+}
+
+.v2-ajuda-text:hover {
+  color: #0077b6;
+}
+
+/* Mat / Nome Aprovador: grid 2 colunas */
+.v2-mat-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto;
+  align-content: start;
+}
+
+.v2-mat-header {
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: #1a1a2e;
+  text-align: center;
+  padding: 8px 10px;
+  border-bottom: 1px solid #1a3a5c;
+  border-right: 1px solid #1a3a5c;
+}
+
+.v2-mat-value {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #c0392b;
+  text-align: center;
+  padding: 10px 10px;
+  border-right: 1px solid #c8d4e0;
+  word-break: break-word;
+}
+
+/* Logo rodapé direita */
+.v2-footer-logo {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding: 6px 8px;
+  align-self: flex-end;
+}
+
+/* ── Responsivo ──────────────────────────────────────── */
+
+@media (max-width: 600px) {
+  .v2-title { font-size: 1.1rem; }
+  .v2-decor { width: 56px; }
+  .v2-circle-yellow { width: 40px; height: 40px; }
+  .v2-circle-green  { width: 30px; height: 30px; right: 18px; }
+
+  .v2-row { grid-template-columns: 140px 90px 1fr; }
+
+  .v2-ca-section { grid-template-columns: 1fr; }
+  .v2-ca-col-left  { border-right: none; border-bottom: 1px solid #1a3a5c; }
+
+  .v2-bottom-section { grid-template-columns: 1fr; }
+  .v2-ajuda-col { border-right: none; border-bottom: 1px solid #c8d4e0; min-height: 44px; }
+  .v2-mat-col   { padding: 0; }
+  .v2-footer-logo { display: none; }
+}
