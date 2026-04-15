@@ -1,0 +1,11 @@
+PROJETO APP CLASSE IMO (14.04.2026):
+============================================================================
+
+Critérios para definição das Classes de Imobilizado:
+
+- Abas: UAR, Centros de Custo e DEPARA
+
+- Primeira informação fornecida: UAR (Unidade de Adição e Retirada), que deverá possuir lista suspensa com o conteúdo da coluna D da Aba UARs
+  Obs: Os dois primeiros dígitos de cada UAR, são chamados de UP ou Família do Ativo, exemplo UAR 0100001 TERRENO, UP = 01
+
+
