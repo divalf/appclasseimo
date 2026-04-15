@@ -15,10 +15,22 @@
 
         <!-- Logo esquerda -->
         <div class="v2-logo">
-          <svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
-            <path d="M30 5 C14 5 5 16 5 28 C5 36 10 42 18 45 C14 48 12 52 14 56 C20 52 26 50 30 50 C44 50 55 40 55 28 C55 16 46 5 30 5 Z" fill="#0077b6" opacity="0.9"/>
-            <path d="M22 18 C18 22 18 30 22 34 C26 38 34 38 38 34 C42 30 42 22 38 18" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
-            <path d="M20 26 C24 22 36 22 40 26" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+          <svg viewBox="0 0 76 68" xmlns="http://www.w3.org/2000/svg" width="70" height="64">
+            <!-- Linha fina no topo -->
+            <line x1="0" y1="1.5" x2="76" y2="1.5" stroke="#555" stroke-width="1.5"/>
+            <!-- Letra "b": haste vertical -->
+            <rect x="3" y="8" width="11" height="56" rx="2" fill="#00c0e8"/>
+            <!-- Letra "b": bojo externo -->
+            <circle cx="28" cy="46" r="21" fill="#00c0e8"/>
+            <!-- Letra "b": bojo interno (branco) -->
+            <circle cx="28" cy="46" r="13" fill="white"/>
+            <!-- Branco cobre topo do bojo para deixar "b" aberto no topo -->
+            <rect x="14" y="8" width="36" height="25" fill="white"/>
+            <!-- Restaura haste dentro do bloco branco -->
+            <rect x="3" y="8" width="11" height="25" fill="#00c0e8"/>
+            <!-- Letra "S": curva bezier única -->
+            <path d="M 63 11 C 74 11, 74 29, 56 36 C 40 43, 40 57, 63 63"
+                  fill="none" stroke="#00c0e8" stroke-width="10" stroke-linecap="round"/>
           </svg>
         </div>
 
@@ -29,6 +41,7 @@
         <div class="v2-decor">
           <div class="v2-circle v2-circle-yellow"></div>
           <div class="v2-circle v2-circle-green"></div>
+          <div class="v2-circle v2-circle-blue"></div>
         </div>
 
       </header>
@@ -139,10 +152,20 @@
 
           <!-- Logo rodapé direita -->
           <div class="v2-footer-logo">
-            <svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg" width="36" height="36" opacity="0.35">
-              <path d="M30 5 C14 5 5 16 5 28 C5 36 10 42 18 45 C14 48 12 52 14 56 C20 52 26 50 30 50 C44 50 55 40 55 28 C55 16 46 5 30 5 Z" fill="#0077b6"/>
-              <path d="M22 18 C18 22 18 30 22 34 C26 38 34 38 38 34 C42 30 42 22 38 18" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
-              <path d="M20 26 C24 22 36 22 40 26" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+            <svg viewBox="0 0 76 66" xmlns="http://www.w3.org/2000/svg" width="38" height="38" opacity="0.6">
+              <!-- Letra "b": haste vertical -->
+              <rect x="3" y="6" width="11" height="56" rx="2" fill="#00c0e8"/>
+              <!-- Letra "b": bojo externo -->
+              <circle cx="28" cy="44" r="21" fill="#00c0e8"/>
+              <!-- Letra "b": bojo interno (branco) -->
+              <circle cx="28" cy="44" r="13" fill="white"/>
+              <!-- Branco cobre topo do bojo -->
+              <rect x="14" y="6" width="36" height="23" fill="white"/>
+              <!-- Restaura haste -->
+              <rect x="3" y="6" width="11" height="23" fill="#00c0e8"/>
+              <!-- Letra "S" -->
+              <path d="M 63 9 C 74 9, 74 27, 56 34 C 40 41, 40 55, 63 61"
+                    fill="none" stroke="#00c0e8" stroke-width="10" stroke-linecap="round"/>
             </svg>
           </div>
 

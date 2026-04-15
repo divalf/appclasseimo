@@ -69,10 +69,11 @@ body {
 
 /* Círculos decorativos */
 .v2-decor {
-  width: 80px;
-  height: 64px;
+  width: 92px;
+  height: 68px;
   flex-shrink: 0;
   position: relative;
+  overflow: visible;
 }
 
 .v2-circle {
@@ -81,19 +82,27 @@ body {
 }
 
 .v2-circle-yellow {
-  width: 58px;
-  height: 58px;
+  width: 66px;
+  height: 66px;
   background: #ffd700;
-  top: 0;
-  right: 0;
+  top: -4px;
+  right: 2px;
 }
 
 .v2-circle-green {
-  width: 44px;
-  height: 44px;
+  width: 52px;
+  height: 52px;
   background: #2ecc71;
-  bottom: 0;
-  right: 28px;
+  top: 4px;
+  right: 36px;
+}
+
+.v2-circle-blue {
+  width: 56px;
+  height: 56px;
+  background: #00c0e8;
+  top: 22px;
+  right: -22px;
 }
 
 /* ── Alerta incompatível ─────────────────────────────── */
@@ -187,21 +196,33 @@ body {
 }
 
 .v2-btn {
-  background: #1a3a5c;
+  background: linear-gradient(to bottom, #224e7a, #1a3a5c);
   color: #fff;
   border: none;
+  border-bottom: 4px solid #0d2135;
+  border-right: 2px solid #0d2135;
   padding: 9px 28px;
   font-size: 0.875rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.07em;
   cursor: pointer;
-  border-radius: 3px;
-  transition: background 0.2s;
+  border-radius: 5px;
+  box-shadow: 0 5px 8px rgba(0,0,0,0.30), inset 0 1px 0 rgba(255,255,255,0.18);
+  position: relative;
+  top: 0;
+  transition: box-shadow 0.1s, top 0.1s, border-bottom-width 0.1s;
 }
 
 .v2-btn:hover {
-  background: #00b4d8;
+  background: linear-gradient(to bottom, #2a5e8a, #224e7a);
+  box-shadow: 0 6px 10px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.18);
+}
+
+.v2-btn:active {
+  top: 3px;
+  border-bottom-width: 1px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.10);
 }
 
 /* ── Seção 2: FC / Grupo de Bens / UM ───────────────── */
@@ -372,9 +393,10 @@ body {
 
 @media (max-width: 600px) {
   .v2-title { font-size: 1.1rem; }
-  .v2-decor { width: 56px; }
-  .v2-circle-yellow { width: 40px; height: 40px; }
-  .v2-circle-green  { width: 30px; height: 30px; right: 18px; }
+  .v2-decor { width: 60px; }
+  .v2-circle-yellow { width: 44px; height: 44px; top: -2px; right: 1px; }
+  .v2-circle-green  { width: 34px; height: 34px; top: 3px; right: 22px; }
+  .v2-circle-blue   { width: 36px; height: 36px; top: 14px; right: -14px; }
 
   .v2-row { grid-template-columns: 140px 90px 1fr; }
 
