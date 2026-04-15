@@ -7,8 +7,51 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <div id="app">
-    <!-- preenchido nas tasks seguintes -->
+  <div class="container">
+    <header class="header">
+      <h1>Classificação de Ativo Imobilizado</h1>
+      <p class="subtitle">Determina a Classe do Ativo a partir da UAR e Centro de Custo</p>
+    </header>
+    <main class="form-card">
+      <section class="form-section">
+        <h2>Dados de Entrada</h2>
+        <div class="field-group">
+          <label for="uar-input">UAR (Unidade de Adição e Retirada)</label>
+          <input type="text" id="uar-input" list="uar-list" placeholder="Digite ou cole o código da UAR..." autocomplete="off" />
+          <datalist id="uar-list"></datalist>
+          <span class="field-hint" id="uar-desc"></span>
+        </div>
+        <div class="field-group">
+          <label for="cc-input">Centro de Custo Solicitante</label>
+          <input type="text" id="cc-input" list="cc-list" placeholder="Digite ou cole o Centro de Custo..." autocomplete="off" />
+          <datalist id="cc-list"></datalist>
+          <span class="field-hint" id="cc-desc"></span>
+        </div>
+        <button id="btn-calcular" type="button">Determinar Classe</button>
+      </section>
+      <section class="result-section" id="result-section" style="display:none">
+        <h2>Resultado</h2>
+        <div id="result-incompativel" class="alert alert-error" style="display:none">
+          <strong>UAR Incompatível com o Centro de Custo</strong>
+        </div>
+        <div id="result-grid">
+          <div class="result-item"><span class="result-label">Classe do Ativo (CA)</span><span class="result-value" id="res-ca">—</span></div>
+          <div class="result-item"><span class="result-label">Descrição da Classe</span><span class="result-value" id="res-descup">—</span></div>
+          <div class="result-item"><span class="result-label">UAR selecionada</span><span class="result-value" id="res-uar">—</span></div>
+          <div class="result-item"><span class="result-label">Descrição da UAR</span><span class="result-value" id="res-descuar">—</span></div>
+          <div class="result-item"><span class="result-label">Família (UP)</span><span class="result-value" id="res-up">—</span></div>
+          <div class="result-item"><span class="result-label">Centro de Custo</span><span class="result-value" id="res-cc">—</span></div>
+          <div class="result-item"><span class="result-label">Descrição CC</span><span class="result-value" id="res-desccc">—</span></div>
+          <div class="result-item"><span class="result-label">Classificação (CL)</span><span class="result-value" id="res-cl">—</span></div>
+          <div class="result-item"><span class="result-label">Tipo Contrato (TC)</span><span class="result-value" id="res-tc">—</span></div>
+          <div class="result-item"><span class="result-label">Forma de Controle (FC)</span><span class="result-value" id="res-fc">—</span></div>
+          <div class="result-item"><span class="result-label">Tipo de Bem (GB)</span><span class="result-value" id="res-gb">—</span></div>
+          <div class="result-item"><span class="result-label">Unidade de Medida (UM)</span><span class="result-value" id="res-um">—</span></div>
+          <div class="result-item"><span class="result-label">Responsável (NomeAprov)</span><span class="result-value" id="res-nomeaprov">—</span></div>
+          <div class="result-item"><span class="result-label">Matrícula (Mat)</span><span class="result-value" id="res-mat">—</span></div>
+        </div>
+      </section>
+    </main>
   </div>
   <script src="js/data.js"></script>
   <script src="js/logic.js"></script>
