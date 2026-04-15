@@ -216,10 +216,108 @@ function validate(uar7, up, cl) {
   return null;
 }
 
+/**
+ * Retorna NomeAprov e Mat do CC para o Critério 6.
+ * @param {string} cc
+ * @param {Array} ccData
+ * @returns {{ nomeAprov: string, mat: string }}
+ */
+function getCCFinalData(cc, ccData) {
+  if (!Array.isArray(ccData)) return { nomeAprov: '', mat: '' };
+  const row = ccData.find(r => r.cc === cc);
+  if (!row) return { nomeAprov: '', mat: '' };
+  return { nomeAprov: row.responsavel, mat: row.usuarioResponsavel };
+}
+
+/**
+ * Função orquestradora principal — executa todos os critérios.
+ *
+ * @param {string|number} uarRaw
+ * @param {string}        ccRaw
+ * @param {Array}         uarData
+ * @param {Array}         ccData
+ * @param {Array}         deparaData
+ * @returns {{
+ *   uar, up, descUAR, descUP,
+ *   cc, descCC, cl, descCL, tc, descTC, tcc,
+ *   ca, fc, gb, um, nomeAprov, mat
+ * }}
+ */
+function calcularClasse(uarRaw, ccRaw, uarData, ccData, deparaData) {
+  const uar7  = formatUAR(uarRaw);
+  const up    = getUP(uar7);
+  const upNum = parseInt(up, 10);
+
+  const descUAR = getDescUAR(uar7, uarData);
+  const cc      = String(ccRaw).trim();
+  const descCC  = getDescCC(cc, ccData);
+  const cl      = getCL(cc, ccData);
+  const descCL  = getDescCL(cl);
+  const tc      = getTC(cc, ccData);
+  const descTC  = getDescTC(tc);
+  const tcc     = getTCC(cc, ccData);
+
+  const empty = { fc: '', gb: '', um: '', nomeAprov: '', mat: '' };
+
+  // Verificar UAR especial (9100300, 9100950, 9100900, 9100800)
+  const special = getSpecialUAR(uar7);
+  if (special) {
+    const { nomeAprov, mat } = getCCFinalData(cc, ccData);
+    const depRow = deparaData ? deparaData.find(r => r.atual === special.ca) : null;
+    return {
+      uar: uar7, up, descUAR, descUP: special.descUP,
+      cc, descCC, cl, descCL, tc, descTC, tcc,
+      ca: special.ca,
+      fc: depRow ? depRow.formaControle : '',
+      gb: depRow ? depRow.tipoBem : '',
+      um: depRow ? depRow.unidMedida : '',
+      nomeAprov, mat,
+    };
+  }
+
+  // Obter DescUP do DEPARA
+  const descUP = getDescUPFromDepara(upNum, deparaData);
+
+  // Critério 5 — Validações de incompatibilidade
+  const incomp = validate(uar7, up, cl);
+  if (incomp) {
+    return {
+      uar: uar7, up, descUAR, descUP: incomp.descUP,
+      cc, descCC, cl, descCL, tc, descTC, tcc,
+      ca: incomp.ca,
+      ...empty,
+    };
+  }
+
+  // Critério 4 — Definição prévia de CA
+  const caResult = getCA(cl, tc, tcc, upNum, deparaData);
+  if (!caResult) {
+    return {
+      uar: uar7, up, descUAR, descUP,
+      cc, descCC, cl, descCL, tc, descTC, tcc,
+      ca: '',
+      ...empty,
+    };
+  }
+
+  // Critério 6 — Dados finais
+  const { nomeAprov, mat } = getCCFinalData(cc, ccData);
+
+  return {
+    uar: uar7, up, descUAR, descUP: caResult.descUP || descUP,
+    cc, descCC, cl, descCL, tc, descTC, tcc,
+    ca: caResult.ca,
+    fc: caResult.fc,
+    gb: caResult.gb,
+    um: caResult.um,
+    nomeAprov, mat,
+  };
+}
+
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     formatUAR, getUP, getDescUAR, getDescUPFromDepara, getSpecialUAR,
     getCL, getDescCL, getTC, getDescTC, getDescCC,
-    getTCC, getCA, validate,
+    getTCC, getCA, validate, getCCFinalData, calcularClasse,
   };
 }

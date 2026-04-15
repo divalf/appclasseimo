@@ -279,3 +279,50 @@ describe('Critério 5 – Validações', () => {
     expect(logic.validate('0100001', '01', '0')).toBeNull();
   });
 });
+
+describe('Critério 6 – Dados finais do CC', () => {
+  test('getCCFinalData: retorna NomeAprov e Mat do CC', () => {
+    const result = logic.getCCFinalData('1000000000', CC_SAMPLE);
+    expect(result).toEqual({ nomeAprov: 'CARLOS AUGUSTO', mat: '131749' });
+  });
+
+  test('getCCFinalData: CC inexistente retorna vazios', () => {
+    const result = logic.getCCFinalData('9999999999', CC_SAMPLE);
+    expect(result).toEqual({ nomeAprov: '', mat: '' });
+  });
+
+  test('getCCFinalData: ccData null retorna vazios', () => {
+    const result = logic.getCCFinalData('1000000000', null);
+    expect(result).toEqual({ nomeAprov: '', mat: '' });
+  });
+});
+
+describe('Orquestrador – calcularClasse', () => {
+  test('retorna Incompatível para UP=10 com CL!=A', () => {
+    // CC '1000000000' tem CL='0' (centroLucro[6]='0'), UP='10' → incompatível
+    const result = logic.calcularClasse('1000001', '1000000000', UAR_SAMPLE, CC_SAMPLE, DEPARA_FULL);
+    expect(result.ca).toBe('Incompatível');
+    expect(result.fc).toBe('');
+    expect(result.nomeAprov).toBe('');
+    expect(result.mat).toBe('');
+  });
+
+  test('retorna CA correto para UAR 0100001 com CC imobilizado', () => {
+    // UAR 0100001 → UP='01' → upNum=1
+    // CC '1000000000' → CL='0', TC='O', TCC='N'
+    // DEPARA_FULL: up=1, tipoContrato='Imobilizado' → atual='13010101'
+    const result = logic.calcularClasse('0100001', '1000000000', UAR_SAMPLE, CC_SAMPLE, DEPARA_FULL);
+    expect(result.ca).toBe('13010101');
+    expect(result.up).toBe('01');
+    expect(result.descUAR).toBe('TERRENO');
+    expect(result.fc).toBe('Individual');
+    expect(result.nomeAprov).toBe('CARLOS AUGUSTO');
+    expect(result.mat).toBe('131749');
+  });
+
+  test('UAR especial 9100300 retorna CA direto', () => {
+    const result = logic.calcularClasse('9100300', '1000000000', UAR_SAMPLE, CC_SAMPLE, DEPARA_FULL);
+    expect(result.ca).toBe('F1402000');
+    expect(result.descUP).toBe('DIREITO DE USO – CPC06');
+  });
+});
