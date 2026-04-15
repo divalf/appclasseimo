@@ -117,3 +117,76 @@ describe('Critério 2 – Centro de Custo', () => {
     expect(logic.getCL('1111111111', null)).toBe('');
   });
 });
+
+const DEPARA_FULL = [
+  // CL=0 (Imobilizado)
+  { atual: '13010101', tipologiaCC: '-', up: 1, descUP: 'Terrenos', tipoContrato: 'Imobilizado', formaControle: 'Individual', tipoBem: 'Imóvel', unidMedida: 'M2' },
+  { atual: '13010104', tipologiaCC: '-', up: 2, descUP: 'Estruturas de Saneamento', tipoContrato: 'Imobilizado', formaControle: 'Individual', tipoBem: 'Imóvel', unidMedida: 'un' },
+  // CL=A + TC=U (URAE) + TCC=D
+  { atual: 'AU140101', tipologiaCC: 'D', up: 1, descUP: 'Terrenos', tipoContrato: 'URAE', formaControle: 'Individual', tipoBem: 'Imóvel', unidMedida: 'M2' },
+  // CL=A + TC=O (Outros) + TCC=D
+  { atual: 'AO140101', tipologiaCC: 'D', up: 1, descUP: 'Terrenos', tipoContrato: 'Outros', formaControle: 'Individual', tipoBem: 'Imóvel', unidMedida: 'M2' },
+  // CL=A + TC=U + TCC=E
+  { atual: 'AU140102', tipologiaCC: 'E', up: 1, descUP: 'Terrenos', tipoContrato: 'URAE', formaControle: 'Individual', tipoBem: 'Imóvel', unidMedida: 'M2' },
+];
+
+describe('Critério 3 – TCC', () => {
+  test('getTCC: retorna Tipo de Centro de Custo', () => {
+    expect(logic.getTCC('1000000000', CC_SAMPLE)).toBe('N');
+    expect(logic.getTCC('5100300100', CC_SAMPLE)).toBe('L');
+    expect(logic.getTCC('9999999999', CC_SAMPLE)).toBe('');
+    expect(logic.getTCC('1000000000', null)).toBe('');
+  });
+});
+
+describe('Critério 4 – Definição Prévia de CA', () => {
+  test('getCA: CL=0 retorna classe imobilizado pelo UP', () => {
+    const result = logic.getCA('0', 'O', '-', 1, DEPARA_FULL);
+    expect(result).not.toBeNull();
+    expect(result.ca).toBe('13010101');
+    expect(result.fc).toBe('Individual');
+    expect(result.gb).toBe('Imóvel');
+    expect(result.um).toBe('M2');
+  });
+
+  test('getCA: CL=A + TC=U + TCC=D retorna classe URAE Água', () => {
+    const result = logic.getCA('A', 'U', 'D', 1, DEPARA_FULL);
+    expect(result).not.toBeNull();
+    expect(result.ca).toBe('AU140101');
+  });
+
+  test('getCA: CL=A + TC=O + TCC=D retorna classe Outros Água', () => {
+    const result = logic.getCA('A', 'O', 'D', 1, DEPARA_FULL);
+    expect(result).not.toBeNull();
+    expect(result.ca).toBe('AO140101');
+  });
+
+  test('getCA: CL=A + TCC=- + UP=1 retorna PI129500', () => {
+    const result = logic.getCA('A', 'U', '-', 1, DEPARA_FULL);
+    expect(result).not.toBeNull();
+    expect(result.ca).toBe('PI129500');
+    expect(result.fc).toBe('');
+  });
+
+  test('getCA: CL=E + TCC=- + UP=1 retorna PI129500', () => {
+    const result = logic.getCA('E', 'U', '-', 1, DEPARA_FULL);
+    expect(result).not.toBeNull();
+    expect(result.ca).toBe('PI129500');
+  });
+
+  test('getCA: CL=G + TCC=- + UP=2 retorna PI129501', () => {
+    const result = logic.getCA('G', 'O', '-', 2, DEPARA_FULL);
+    expect(result).not.toBeNull();
+    expect(result.ca).toBe('PI129501');
+    expect(result.fc).toBe('');
+  });
+
+  test('getCA: sem match retorna null', () => {
+    const result = logic.getCA('A', 'U', 'X', 999, DEPARA_FULL);
+    expect(result).toBeNull();
+  });
+
+  test('getCA: DEPARA null retorna null', () => {
+    expect(logic.getCA('0', 'O', '-', 1, null)).toBeNull();
+  });
+});

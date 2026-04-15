@@ -124,9 +124,73 @@ function getDescCC(cc, ccData) {
   return row ? row.descCC : '';
 }
 
+/**
+ * Retorna o Tipo de Centro de Custo (TCC) do CC.
+ * @param {string} cc
+ * @param {Array} ccData
+ * @returns {string}
+ */
+function getTCC(cc, ccData) {
+  if (!Array.isArray(ccData)) return '';
+  const row = ccData.find(r => r.cc === cc);
+  return row ? row.tipoCentroCusto : '';
+}
+
+/**
+ * Determina a Classe do Ativo (CA) conforme o Critério 4.
+ * Retorna { ca, descUP, fc, gb, um } ou null se não encontrar.
+ *
+ * Regras especiais (antes do lookup no DEPARA):
+ * - CL=A/E/G + TCC='-' + UP=1 → CA='PI129500'
+ * - CL=A/E/G + TCC='-' + UP=2 → CA='PI129501'
+ *
+ * Para CL=A/E/G: filtra DEPARA por up===upNum, tipoContrato===DescTC, tipologiaCC===tcc
+ * Para CL=0:     filtra DEPARA por up===upNum, tipoContrato==='Imobilizado'
+ *
+ * @param {string} cl    - 'A','E','G','0'
+ * @param {string} tc    - 'U','O'
+ * @param {string} tcc   - tipologia CC
+ * @param {number} upNum - UP como número inteiro
+ * @param {Array}  deparaData
+ * @returns {{ ca: string, descUP: string, fc: string, gb: string, um: string } | null}
+ */
+function getCA(cl, tc, tcc, upNum, deparaData) {
+  if (!Array.isArray(deparaData)) return null;
+
+  if (cl === 'A' || cl === 'E' || cl === 'G') {
+    // Casos especiais: TCC='-' com UP=01 ou UP=02
+    if (tcc === '-' && upNum === 1) {
+      return { ca: 'PI129500', descUP: '', fc: '', gb: '', um: '' };
+    }
+    if (tcc === '-' && upNum === 2) {
+      return { ca: 'PI129501', descUP: '', fc: '', gb: '', um: '' };
+    }
+    const descTC = getDescTC(tc); // 'URAE' ou 'Outros'
+    const row = deparaData.find(r =>
+      r.up === upNum &&
+      r.tipoContrato === descTC &&
+      r.tipologiaCC === tcc
+    );
+    if (!row) return null;
+    return { ca: row.atual, descUP: row.descUP, fc: row.formaControle, gb: row.tipoBem, um: row.unidMedida };
+  }
+
+  if (cl === '0') {
+    const row = deparaData.find(r =>
+      r.up === upNum &&
+      r.tipoContrato === 'Imobilizado'
+    );
+    if (!row) return null;
+    return { ca: row.atual, descUP: row.descUP, fc: row.formaControle, gb: row.tipoBem, um: row.unidMedida };
+  }
+
+  return null;
+}
+
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     formatUAR, getUP, getDescUAR, getDescUPFromDepara, getSpecialUAR,
     getCL, getDescCL, getTC, getDescTC, getDescCC,
+    getTCC, getCA,
   };
 }
