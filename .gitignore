@@ -1,0 +1,15 @@
+# Binary files (Excel, PowerPoint)
+*.xlsx
+*.pptx
+
+# Test dependencies and coverage
+tests/node_modules/
+tests/coverage/
+tests/package-lock.json
+
+# Temporary files
+*_tmp.*
+layoutmodelo.png
+
+# Generated directories
+docs/
