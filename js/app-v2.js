@@ -95,4 +95,23 @@ document.addEventListener('DOMContentLoaded', function () {
     const el = document.getElementById(id);
     if (el) el.textContent = value || '\u2014';
   }
+
+  // --- Modal de Ajuda ---
+  const modalAjuda   = document.getElementById('modal-ajuda');
+  const btnAjuda     = document.getElementById('btn-ajuda');
+  const btnFechar    = document.getElementById('btn-fechar-ajuda');
+  const modalOverlay = document.getElementById('modal-overlay');
+
+  function abrirAjuda()  { modalAjuda.style.display = 'flex'; }
+  function fecharAjuda() { modalAjuda.style.display = 'none'; }
+
+  btnAjuda.addEventListener('click', abrirAjuda);
+  btnAjuda.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); abrirAjuda(); }
+  });
+  btnFechar.addEventListener('click', fecharAjuda);
+  modalOverlay.addEventListener('click', fecharAjuda);
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') fecharAjuda();
+  });
 });

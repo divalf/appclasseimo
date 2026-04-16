@@ -15,33 +15,15 @@
 
         <!-- Logo esquerda -->
         <div class="v2-logo">
-          <svg viewBox="0 0 76 68" xmlns="http://www.w3.org/2000/svg" width="70" height="64">
-            <!-- Linha fina no topo -->
-            <line x1="0" y1="1.5" x2="76" y2="1.5" stroke="#555" stroke-width="1.5"/>
-            <!-- Letra "b": haste vertical -->
-            <rect x="3" y="8" width="11" height="56" rx="2" fill="#00c0e8"/>
-            <!-- Letra "b": bojo externo -->
-            <circle cx="28" cy="46" r="21" fill="#00c0e8"/>
-            <!-- Letra "b": bojo interno (branco) -->
-            <circle cx="28" cy="46" r="13" fill="white"/>
-            <!-- Branco cobre topo do bojo para deixar "b" aberto no topo -->
-            <rect x="14" y="8" width="36" height="25" fill="white"/>
-            <!-- Restaura haste dentro do bloco branco -->
-            <rect x="3" y="8" width="11" height="25" fill="#00c0e8"/>
-            <!-- Letra "S": curva bezier única -->
-            <path d="M 63 11 C 74 11, 74 29, 56 36 C 40 43, 40 57, 63 63"
-                  fill="none" stroke="#00c0e8" stroke-width="10" stroke-linecap="round"/>
-          </svg>
+          <img src="lgosabesp.jpg" alt="Logo Sabesp">
         </div>
 
         <!-- Título -->
         <h1 class="v2-title">Definir a Classe do Ativo</h1>
 
-        <!-- Círculos decorativos -->
+        <!-- Imagem decorativa superior direita -->
         <div class="v2-decor">
-          <div class="v2-circle v2-circle-yellow"></div>
-          <div class="v2-circle v2-circle-green"></div>
-          <div class="v2-circle v2-circle-blue"></div>
+          <img src="imgemsuperiordireita.jpg" alt="" class="v2-decor-img">
         </div>
 
       </header>
@@ -96,7 +78,7 @@
           </div>
 
           <!-- Centro de Lucro -->
-          <div class="v2-row v2-row-last">
+          <div class="v2-row">
             <span class="v2-label">Centro de Lucro:</span>
             <span class="v2-val" id="res-cl">—</span>
             <span class="v2-desc-out" id="res-desccl">—</span>
@@ -140,7 +122,7 @@
         <section class="v2-bottom-section">
 
           <div class="v2-ajuda-col">
-            <span class="v2-ajuda-text">Ajuda</span>
+            <span class="v2-ajuda-text" id="btn-ajuda" role="button" tabindex="0">Ajuda</span>
           </div>
 
           <div class="v2-mat-col">
@@ -152,21 +134,7 @@
 
           <!-- Logo rodapé direita -->
           <div class="v2-footer-logo">
-            <svg viewBox="0 0 76 66" xmlns="http://www.w3.org/2000/svg" width="38" height="38" opacity="0.6">
-              <!-- Letra "b": haste vertical -->
-              <rect x="3" y="6" width="11" height="56" rx="2" fill="#00c0e8"/>
-              <!-- Letra "b": bojo externo -->
-              <circle cx="28" cy="44" r="21" fill="#00c0e8"/>
-              <!-- Letra "b": bojo interno (branco) -->
-              <circle cx="28" cy="44" r="13" fill="white"/>
-              <!-- Branco cobre topo do bojo -->
-              <rect x="14" y="6" width="36" height="23" fill="white"/>
-              <!-- Restaura haste -->
-              <rect x="3" y="6" width="11" height="23" fill="#00c0e8"/>
-              <!-- Letra "S" -->
-              <path d="M 63 9 C 74 9, 74 27, 56 34 C 40 41, 40 55, 63 61"
-                    fill="none" stroke="#00c0e8" stroke-width="10" stroke-linecap="round"/>
-            </svg>
+            <img src="lgosabesp.jpg" alt="">
           </div>
 
         </section>
@@ -174,6 +142,46 @@
       </div><!-- /v2-body -->
     </div><!-- /v2-card -->
   </div><!-- /v2-page -->
+
+  <!-- ── MODAL DE AJUDA ── -->
+  <div id="modal-ajuda" class="v2-modal" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="modal-titulo">
+    <div class="v2-modal-overlay" id="modal-overlay"></div>
+    <div class="v2-modal-box">
+      <div class="v2-modal-header">
+        <span class="v2-modal-title" id="modal-titulo">Como Determinar a Classe do Ativo — Passo a Passo</span>
+        <button class="v2-modal-close" id="btn-fechar-ajuda" aria-label="Fechar">&times;</button>
+      </div>
+      <ol class="v2-modal-steps">
+        <li>
+          <strong>Informe o Centro de Custo (CC):</strong>
+          Cole ou selecione da lista suspensa o código do CC do solicitante.
+          A descrição será preenchida automaticamente ao lado.
+        </li>
+        <li>
+          <strong>Informe a UAR:</strong>
+          Cole ou selecione da lista a Unidade de Adição e Retirada do ativo.
+          Os campos <em>Tipo de Contrato (TC)</em>, <em>Tipo Centro Custo (TCC)</em>
+          e <em>Centro de Lucro (CL)</em> serão calculados automaticamente.
+        </li>
+        <li>
+          <strong>Clique em "DETERMINAR CLASSE":</strong>
+          O sistema aplica os critérios e exibe a <em>Classe do Ativo (CA)</em>,
+          a Forma de Controle (FC), o Grupo de Bens (GB) e a Unidade de Medida (UM).
+        </li>
+        <li>
+          <strong>Interprete o resultado:</strong>
+          O campo <em>CA</em> (em destaque) mostra a classe definida.
+          A coluna à direita exibe a descrição completa da classe.
+          Matrícula e Nome do Aprovador são preenchidos conforme o CC informado.
+        </li>
+        <li>
+          <strong>Atenção — resultado "Incompatível":</strong>
+          Indica que a UAR selecionada não é compatível com o Centro de Custo informado.
+          Verifique e corrija os dados antes de prosseguir.
+        </li>
+      </ol>
+    </div>
+  </div>
 
   <script src="js/data.js"></script>
   <script src="js/logic.js"></script>

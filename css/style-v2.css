@@ -36,7 +36,7 @@ body {
 .v2-header {
   display: flex;
   align-items: center;
-  padding: 10px 16px 10px 12px;
+  padding: 10px 0 10px 12px;
   border-bottom: 2px solid #1a3a5c;
   background: #fff;
   min-height: 76px;
@@ -44,16 +44,17 @@ body {
 }
 
 .v2-logo {
-  width: 64px;
+  width: 68px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.v2-logo svg {
-  width: 56px;
-  height: 56px;
+.v2-logo img {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
 }
 
 .v2-title {
@@ -67,42 +68,19 @@ body {
   padding: 0 12px;
 }
 
-/* Círculos decorativos */
+/* Imagem decorativa superior direita */
 .v2-decor {
-  width: 92px;
-  height: 68px;
   flex-shrink: 0;
-  position: relative;
-  overflow: visible;
+  align-self: stretch;
+  display: flex;
+  align-items: flex-start;
+  overflow: hidden;
 }
 
-.v2-circle {
-  position: absolute;
-  border-radius: 50%;
-}
-
-.v2-circle-yellow {
-  width: 66px;
-  height: 66px;
-  background: #ffd700;
-  top: -4px;
-  right: 2px;
-}
-
-.v2-circle-green {
-  width: 52px;
-  height: 52px;
-  background: #2ecc71;
-  top: 4px;
-  right: 36px;
-}
-
-.v2-circle-blue {
-  width: 56px;
-  height: 56px;
-  background: #00c0e8;
-  top: 22px;
-  right: -22px;
+.v2-decor-img {
+  height: 100%;
+  width: auto;
+  display: block;
 }
 
 /* ── Alerta incompatível ─────────────────────────────── */
@@ -129,17 +107,12 @@ body {
   border-bottom: 2px solid #1a3a5c;
 }
 
-/* Linha genérica: label | value | desc */
+/* Linha genérica: label | value | desc (sem linhas de grade) */
 .v2-row {
   display: grid;
   grid-template-columns: 172px 130px 1fr;
   align-items: center;
-  border-bottom: 1px solid #c8d4e0;
   min-height: 38px;
-}
-
-.v2-row-last {
-  border-bottom: none;
 }
 
 .v2-label {
@@ -158,13 +131,14 @@ body {
 .v2-input-yellow {
   width: 100%;
   background: #ffff00;
-  border: 1.5px solid #b0b000;
+  border: 1.5px solid #1D4166;
   padding: 4px 7px;
   font-size: 0.875rem;
   font-weight: 700;
-  color: #1a1a2e;
+  color: #1D4166;
   outline: none;
   border-radius: 2px;
+  text-align: center;
 }
 
 .v2-input-yellow:focus {
@@ -177,30 +151,30 @@ body {
   padding: 6px 10px;
   font-weight: 700;
   font-size: 0.9rem;
-  color: #1a1a2e;
+  color: #1D4166;
 }
 
-/* Descrições dos valores (vermelho) */
+/* Descrições dos valores (vermelho) — centralizadas no espaço restante */
 .v2-desc-out {
   padding: 6px 12px;
   font-weight: 700;
   font-size: 0.875rem;
   color: #c0392b;
   word-break: break-word;
+  text-align: center;
 }
 
 /* Botão de calcular */
 .v2-btn-row {
   padding: 10px 14px;
-  border-top: 1px solid #c8d4e0;
 }
 
 .v2-btn {
   background: linear-gradient(to bottom, #224e7a, #1a3a5c);
-  color: #fff;
-  border: none;
-  border-bottom: 4px solid #0d2135;
-  border-right: 2px solid #0d2135;
+  color: #FFFF00;
+  border: 2px solid #FFFF00;
+  border-bottom: 5px solid #b8a000;
+  border-right: 3px solid #b8a000;
   padding: 9px 28px;
   font-size: 0.875rem;
   font-weight: 700;
@@ -211,6 +185,9 @@ body {
   box-shadow: 0 5px 8px rgba(0,0,0,0.30), inset 0 1px 0 rgba(255,255,255,0.18);
   position: relative;
   top: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   transition: box-shadow 0.1s, top 0.1s, border-bottom-width 0.1s;
 }
 
@@ -250,7 +227,7 @@ body {
   color: #c0392b;
   text-align: center;
   padding: 9px 10px;
-  border-right: 1px solid #c8d4e0;
+  border-right: 1px solid #1a3a5c;
 }
 
 .v2-no-right {
@@ -291,7 +268,7 @@ body {
   align-items: center;
   justify-content: center;
   background: #1a4a6e;
-  color: #fff;
+  color: #FFFF00;
   font-size: 1.35rem;
   font-weight: 900;
   padding: 14px 10px;
@@ -346,6 +323,8 @@ body {
   cursor: pointer;
   letter-spacing: 0.04em;
   transition: color 0.2s;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .v2-ajuda-text:hover {
@@ -376,7 +355,7 @@ body {
   color: #c0392b;
   text-align: center;
   padding: 10px 10px;
-  border-right: 1px solid #c8d4e0;
+  border-right: 1px solid #1a3a5c;
   word-break: break-word;
 }
 
@@ -389,14 +368,100 @@ body {
   align-self: flex-end;
 }
 
+.v2-footer-logo img {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  opacity: 0.5;
+}
+
+/* ── Modal de Ajuda ──────────────────────────────────── */
+
+.v2-modal {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.v2-modal-overlay {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5);
+}
+
+.v2-modal-box {
+  position: relative;
+  background: #fff;
+  border: 2px solid #1a3a5c;
+  border-left: 8px solid #00b4d8;
+  border-radius: 4px;
+  max-width: 580px;
+  width: 92%;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.28);
+  overflow: hidden;
+}
+
+.v2-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 2px solid #1a3a5c;
+  background: #eef4f9;
+}
+
+.v2-modal-title {
+  font-weight: 900;
+  font-size: 0.95rem;
+  color: #1D4166;
+  letter-spacing: 0.01em;
+}
+
+.v2-modal-close {
+  background: none;
+  border: none;
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+  color: #1a3a5c;
+  padding: 0 2px;
+  transition: color 0.15s;
+}
+
+.v2-modal-close:hover { color: #c0392b; }
+
+.v2-modal-steps {
+  padding: 18px 24px 22px 42px;
+  margin: 0;
+}
+
+.v2-modal-steps li {
+  font-size: 0.9rem;
+  color: #1a1a2e;
+  margin-bottom: 12px;
+  line-height: 1.55;
+}
+
+.v2-modal-steps li:last-child { margin-bottom: 0; }
+
+.v2-modal-steps strong { color: #1D4166; }
+
+.v2-modal-steps em {
+  color: #c0392b;
+  font-style: normal;
+  font-weight: 700;
+}
+
 /* ── Responsivo ──────────────────────────────────────── */
 
 @media (max-width: 600px) {
   .v2-title { font-size: 1.1rem; }
-  .v2-decor { width: 60px; }
-  .v2-circle-yellow { width: 44px; height: 44px; top: -2px; right: 1px; }
-  .v2-circle-green  { width: 34px; height: 34px; top: 3px; right: 22px; }
-  .v2-circle-blue   { width: 36px; height: 36px; top: 14px; right: -14px; }
+  .v2-decor-img { height: 56px; }
 
   .v2-row { grid-template-columns: 140px 90px 1fr; }
 
