@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const ccList    = document.getElementById('cc-list');
   const ccDescEl  = document.getElementById('cc-desc');
   const btnCalc   = document.getElementById('btn-calcular');
+  const btnLimpar = document.getElementById('btn-limpar');
   const resIncomp = document.getElementById('result-incompativel');
 
   // --- Popula datalists ---
@@ -95,6 +96,29 @@ document.addEventListener('DOMContentLoaded', function () {
     const el = document.getElementById(id);
     if (el) el.textContent = value || '\u2014';
   }
+
+  // --- Botão Limpar ---
+  btnLimpar.addEventListener('click', function () {
+    // Inputs
+    ccInput.value  = '';
+    uarInput.value = '';
+    ccDescEl.textContent = '';
+    uarDesc.textContent  = '';
+
+    // Derivados (TC/TCC/CL) e descrições
+    ['res-tc','res-desctc','res-tcc','res-desctcc','res-cl','res-desccl',
+     'res-fc','res-gb','res-um','res-descup','res-mat','res-nomeaprov'
+    ].forEach(function(id) { setText(id, ''); });
+
+    // CA
+    var caBox = document.getElementById('res-ca');
+    if (caBox) { caBox.textContent = '\u2014'; caBox.classList.remove('incompativel'); }
+
+    // Alerta
+    resIncomp.style.display = 'none';
+
+    ccInput.focus();
+  });
 
   // --- Modal de Ajuda ---
   const modalAjuda   = document.getElementById('modal-ajuda');

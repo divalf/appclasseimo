@@ -1,6 +1,5 @@
 /* =====================================================
    style-v2.css — APP Classe IMO (Versão 2)
-   Layout baseado no modelo de referência
    ===================================================== */
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -22,29 +21,28 @@ body {
   max-width: 860px;
 }
 
+/* Borda uniforme em todos os lados — forma um quadrilátero */
 .v2-card {
   background: #fff;
-  border: 2px solid #1a3a5c;
-  border-left: 8px solid #00b4d8;
+  border: 8px solid #00b4d8;
   border-radius: 2px;
   overflow: hidden;
   box-shadow: 0 4px 20px rgba(0,0,0,0.15);
 }
 
-/* ── Header ─────────────────────────────────────────── */
+/* ── Header (Hero) — compacto ───────────────────────── */
 
 .v2-header {
   display: flex;
   align-items: center;
-  padding: 10px 0 10px 12px;
+  padding: 0 0 0 10px;          /* sem padding topo/direita → imagem embute na borda */
   border-bottom: 2px solid #1a3a5c;
   background: #fff;
-  min-height: 76px;
-  position: relative;
+  min-height: 60px;
 }
 
 .v2-logo {
-  width: 68px;
+  width: 72px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -52,15 +50,15 @@ body {
 }
 
 .v2-logo img {
-  width: 60px;
-  height: 60px;
+  width: 64px;
+  height: 64px;
   object-fit: contain;
 }
 
 .v2-title {
   flex: 1;
   text-align: center;
-  font-size: 1.65rem;
+  font-size: 1.85rem;
   font-weight: 900;
   color: #00b4d8;
   letter-spacing: 0.01em;
@@ -68,7 +66,7 @@ body {
   padding: 0 12px;
 }
 
-/* Imagem decorativa superior direita */
+/* Imagem decorativa — preenche toda a altura do header, toca a borda superior */
 .v2-decor {
   flex-shrink: 0;
   align-self: stretch;
@@ -107,7 +105,7 @@ body {
   border-bottom: 2px solid #1a3a5c;
 }
 
-/* Linha genérica: label | value | desc (sem linhas de grade) */
+/* Linha genérica: label | value | desc — sem linhas de grade */
 .v2-row {
   display: grid;
   grid-template-columns: 172px 130px 1fr;
@@ -154,7 +152,7 @@ body {
   color: #1D4166;
 }
 
-/* Descrições dos valores (vermelho) — centralizadas no espaço restante */
+/* Descrições dos valores — centralizadas no espaço restante */
 .v2-desc-out {
   padding: 6px 12px;
   font-weight: 700;
@@ -164,11 +162,16 @@ body {
   text-align: center;
 }
 
-/* Botão de calcular */
+/* ── Botões ──────────────────────────────────────────── */
+
 .v2-btn-row {
   padding: 10px 14px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
 }
 
+/* Base comum — Determinar Classe */
 .v2-btn {
   background: linear-gradient(to bottom, #224e7a, #1a3a5c);
   color: #FFFF00;
@@ -200,6 +203,26 @@ body {
   top: 3px;
   border-bottom-width: 1px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.10);
+}
+
+/* Botão LIMPAR — mesma estrutura 3D, cores #12CDFF / branco */
+.v2-btn-limpar {
+  background: linear-gradient(to bottom, #1fd8ff, #12CDFF);
+  color: #FFFFFF;
+  border: 2px solid rgba(255,255,255,0.85);
+  border-bottom: 5px solid #0a9ec4;
+  border-right: 3px solid #0a9ec4;
+}
+
+.v2-btn-limpar:hover {
+  background: linear-gradient(to bottom, #2ae0ff, #1dd8ff);
+  box-shadow: 0 6px 10px rgba(0,0,0,0.30), inset 0 1px 0 rgba(255,255,255,0.30);
+}
+
+.v2-btn-limpar:active {
+  top: 3px;
+  border-bottom-width: 1px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.20);
 }
 
 /* ── Seção 2: FC / Grupo de Bens / UM ───────────────── */
@@ -302,9 +325,10 @@ body {
 
 /* ── Seção 4: Rodapé (Ajuda + Mat/Nome) ─────────────── */
 
+/* Logo removido do grid — fica absoluto no canto */
 .v2-bottom-section {
   display: grid;
-  grid-template-columns: 30% 1fr auto;
+  grid-template-columns: 30% 1fr;
   min-height: 80px;
   position: relative;
 }
@@ -331,12 +355,12 @@ body {
   color: #0077b6;
 }
 
-/* Mat / Nome Aprovador: grid 2 colunas */
+/* Mat / Nome: 2 colunas — value row estica até a borda inferior */
 .v2-mat-col {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: auto auto;
-  align-content: start;
+  grid-template-rows: auto 1fr;   /* header auto, value preenche o restante */
+  align-content: stretch;
 }
 
 .v2-mat-header {
@@ -357,15 +381,16 @@ body {
   padding: 10px 10px;
   border-right: 1px solid #1a3a5c;
   word-break: break-word;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* Logo rodapé direita */
+/* Logo rodapé — flutuante no canto inferior direito */
 .v2-footer-logo {
-  display: flex;
-  align-items: flex-end;
-  justify-content: flex-end;
-  padding: 6px 8px;
-  align-self: flex-end;
+  position: absolute;
+  bottom: 6px;
+  right: 8px;
 }
 
 .v2-footer-logo img {
@@ -397,8 +422,7 @@ body {
 .v2-modal-box {
   position: relative;
   background: #fff;
-  border: 2px solid #1a3a5c;
-  border-left: 8px solid #00b4d8;
+  border: 8px solid #00b4d8;
   border-radius: 4px;
   max-width: 580px;
   width: 92%;
@@ -460,8 +484,10 @@ body {
 /* ── Responsivo ──────────────────────────────────────── */
 
 @media (max-width: 600px) {
+  .v2-card { border-width: 5px; }
   .v2-title { font-size: 1.1rem; }
-  .v2-decor-img { height: 56px; }
+  .v2-logo img { width: 48px; height: 48px; }
+  .v2-decor-img { height: 52px; }
 
   .v2-row { grid-template-columns: 140px 90px 1fr; }
 
@@ -472,4 +498,6 @@ body {
   .v2-ajuda-col { border-right: none; border-bottom: 1px solid #c8d4e0; min-height: 44px; }
   .v2-mat-col   { padding: 0; }
   .v2-footer-logo { display: none; }
+
+  .v2-btn-row { flex-wrap: wrap; }
 }

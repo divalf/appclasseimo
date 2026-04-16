@@ -84,10 +84,13 @@
             <span class="v2-desc-out" id="res-desccl">—</span>
           </div>
 
-          <!-- Botão -->
+          <!-- Botões -->
           <div class="v2-btn-row">
             <button id="btn-calcular" type="button" class="v2-btn">
               Determinar Classe
+            </button>
+            <button id="btn-limpar" type="button" class="v2-btn v2-btn-limpar">
+              Limpar
             </button>
           </div>
 
@@ -154,30 +157,35 @@
       <ol class="v2-modal-steps">
         <li>
           <strong>Informe o Centro de Custo (CC):</strong>
-          Cole ou selecione da lista suspensa o código do CC do solicitante.
-          A descrição será preenchida automaticamente ao lado.
+          Cole ou selecione na lista suspensa o código do CC do solicitante.
+          A descrição aparece automaticamente à direita do campo.
         </li>
         <li>
           <strong>Informe a UAR:</strong>
           Cole ou selecione da lista a Unidade de Adição e Retirada do ativo.
-          Os campos <em>Tipo de Contrato (TC)</em>, <em>Tipo Centro Custo (TCC)</em>
-          e <em>Centro de Lucro (CL)</em> serão calculados automaticamente.
+          Os campos <em>TC (Tipo de Contrato)</em>, <em>TCC (Tipo Centro Custo)</em>
+          e <em>CL (Centro de Lucro)</em> são preenchidos automaticamente.
         </li>
         <li>
           <strong>Clique em "DETERMINAR CLASSE":</strong>
           O sistema aplica os critérios e exibe a <em>Classe do Ativo (CA)</em>,
-          a Forma de Controle (FC), o Grupo de Bens (GB) e a Unidade de Medida (UM).
+          Forma de Controle (FC), Grupo de Bens (GB) e Unidade de Medida (UM).
+          Matrícula e Nome do Aprovador também são preenchidos com base no CC.
         </li>
         <li>
           <strong>Interprete o resultado:</strong>
-          O campo <em>CA</em> (em destaque) mostra a classe definida.
-          A coluna à direita exibe a descrição completa da classe.
-          Matrícula e Nome do Aprovador são preenchidos conforme o CC informado.
+          O campo <em>CA</em> (em destaque amarelo) mostra a classe definida.
+          A coluna à direita exibe a descrição completa da Classe do Ativo.
         </li>
         <li>
           <strong>Atenção — resultado "Incompatível":</strong>
-          Indica que a UAR selecionada não é compatível com o Centro de Custo informado.
-          Verifique e corrija os dados antes de prosseguir.
+          A UAR informada não é compatível com o Centro de Custo selecionado.
+          Revise os dois campos e refaça a classificação.
+        </li>
+        <li>
+          <strong>Nova consulta — botão "LIMPAR":</strong>
+          Clique em <em>LIMPAR</em> para apagar todos os campos e resultados,
+          retornando o formulário ao estado inicial para uma nova classificação.
         </li>
       </ol>
     </div>
