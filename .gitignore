@@ -1,6 +1,9 @@
-# Binary files (Excel, PowerPoint)
+# Planilhas-fonte (dados brutos — não vão para o repositório)
 *.xlsx
 *.pptx
+
+# O banco gerado DEVE ser commitado — não ignorar
+!db/classes_imo.db
 
 # Test dependencies and coverage
 tests/node_modules/
