@@ -137,6 +137,19 @@ describe('Critério 3 – TCC', () => {
     expect(logic.getTCC('9999999999', CC_SAMPLE)).toBe('');
     expect(logic.getTCC('1000000000', null)).toBe('');
   });
+
+  test('getDescTCC: mapeia cada código ao nome correto', () => {
+    expect(logic.getDescTCC('E')).toBe('Tratamento de Água');
+    expect(logic.getDescTCC('F')).toBe('Distribuição');
+    expect(logic.getDescTCC('H')).toBe('Coleta');
+    expect(logic.getDescTCC('I')).toBe('Tratamento de Esgoto');
+    expect(logic.getDescTCC('L')).toBe('Adm. Operação');
+    expect(logic.getDescTCC('M')).toBe('Comercial');
+    expect(logic.getDescTCC('N')).toBe('Corporativo');
+    expect(logic.getDescTCC('Z')).toBe('Laboratórios');
+    expect(logic.getDescTCC('-')).toBe('');
+    expect(logic.getDescTCC('')).toBe('');
+  });
 });
 
 describe('Critério 4 – Definição Prévia de CA', () => {

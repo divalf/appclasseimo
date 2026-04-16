@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', function () {
     setText('res-tc',      r.tc);
     setText('res-desctc',  r.descTC);
     setText('res-tcc',     r.tcc);
-    setText('res-desctcc', '');          // TCC não tem descrição própria na spec
+    setText('res-desctcc', r.descTCC);
     setText('res-cl',      r.cl);
     setText('res-desccl',  r.descCL);
 

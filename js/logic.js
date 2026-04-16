@@ -113,6 +113,25 @@ function getDescTC(tc) {
 }
 
 /**
+ * Retorna a descrição do Tipo de Centro de Custo (DescTCC).
+ * @param {string} tcc
+ * @returns {string}
+ */
+function getDescTCC(tcc) {
+  const map = {
+    'E': 'Tratamento de Água',
+    'F': 'Distribuição',
+    'H': 'Coleta',
+    'I': 'Tratamento de Esgoto',
+    'L': 'Adm. Operação',
+    'M': 'Comercial',
+    'N': 'Corporativo',
+    'Z': 'Laboratórios',
+  };
+  return map[tcc] || '';
+}
+
+/**
  * Retorna a descrição do CC (DescCC).
  * @param {string} cc
  * @param {Array} ccData
@@ -239,7 +258,7 @@ function getCCFinalData(cc, ccData) {
  * @param {Array}         deparaData
  * @returns {{
  *   uar, up, descUAR, descUP,
- *   cc, descCC, cl, descCL, tc, descTC, tcc,
+ *   cc, descCC, cl, descCL, tc, descTC, tcc, descTCC,
  *   ca, fc, gb, um, nomeAprov, mat
  * }}
  */
@@ -256,6 +275,7 @@ function calcularClasse(uarRaw, ccRaw, uarData, ccData, deparaData) {
   const tc      = getTC(cc, ccData);
   const descTC  = getDescTC(tc);
   const tcc     = getTCC(cc, ccData);
+  const descTCC = getDescTCC(tcc);
 
   const empty = { fc: '', gb: '', um: '', nomeAprov: '', mat: '' };
 
@@ -266,7 +286,7 @@ function calcularClasse(uarRaw, ccRaw, uarData, ccData, deparaData) {
     const depRow = deparaData ? deparaData.find(r => r.atual === special.ca) : null;
     return {
       uar: uar7, up, descUAR, descUP: special.descUP,
-      cc, descCC, cl, descCL, tc, descTC, tcc,
+      cc, descCC, cl, descCL, tc, descTC, tcc, descTCC,
       ca: special.ca,
       fc: depRow ? depRow.formaControle : '',
       gb: depRow ? depRow.tipoBem : '',
@@ -283,7 +303,7 @@ function calcularClasse(uarRaw, ccRaw, uarData, ccData, deparaData) {
   if (incomp) {
     return {
       uar: uar7, up, descUAR, descUP: incomp.descUP,
-      cc, descCC, cl, descCL, tc, descTC, tcc,
+      cc, descCC, cl, descCL, tc, descTC, tcc, descTCC,
       ca: incomp.ca,
       ...empty,
     };
@@ -294,7 +314,7 @@ function calcularClasse(uarRaw, ccRaw, uarData, ccData, deparaData) {
   if (!caResult) {
     return {
       uar: uar7, up, descUAR, descUP,
-      cc, descCC, cl, descCL, tc, descTC, tcc,
+      cc, descCC, cl, descCL, tc, descTC, tcc, descTCC,
       ca: '',
       ...empty,
     };
@@ -305,7 +325,7 @@ function calcularClasse(uarRaw, ccRaw, uarData, ccData, deparaData) {
 
   return {
     uar: uar7, up, descUAR, descUP: caResult.descUP || descUP,
-    cc, descCC, cl, descCL, tc, descTC, tcc,
+    cc, descCC, cl, descCL, tc, descTC, tcc, descTCC,
     ca: caResult.ca,
     fc: caResult.fc,
     gb: caResult.gb,
@@ -318,6 +338,6 @@ if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     formatUAR, getUP, getDescUAR, getDescUPFromDepara, getSpecialUAR,
     getCL, getDescCL, getTC, getDescTC, getDescCC,
-    getTCC, getCA, validate, getCCFinalData, calcularClasse,
+    getTCC, getDescTCC, getCA, validate, getCCFinalData, calcularClasse,
   };
 }
