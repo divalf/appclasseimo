@@ -16,9 +16,21 @@ Após rodar:
 """
 
 import sqlite3
+import hashlib
 import openpyxl
 import os
 import sys
+
+# ── Administradores ────────────────────────────────────────────────────────────
+USUARIOS = [
+    ('jafagundes', 'Jorge Fagundes'),
+    ('jmartinez',  'Jorge Martinez'),
+    ('pnishiyama', 'Patrick Nishiyama'),
+    ('gmfranco',   'Gildásio Macedo'),
+    ('dfilho',     'Dival S Filho'),
+]
+SENHA_INICIAL = 'SabespS42026'
+SENHA_HASH    = hashlib.sha256(SENHA_INICIAL.encode()).hexdigest()
 
 # ── Caminhos ──────────────────────────────────────────────────────────────────
 BASE       = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -153,6 +165,13 @@ CREATE TABLE depara (
     unid_medida     TEXT DEFAULT ""
 );
 
+-- ── Tabela de Usuários Administradores ────────────────────
+CREATE TABLE users (
+    username TEXT PRIMARY KEY,
+    password TEXT NOT NULL,
+    nome     TEXT DEFAULT ""
+);
+
 -- ── Índices para performance de busca ─────────────────────
 CREATE INDEX idx_depara_up        ON depara(up);
 CREATE INDEX idx_depara_tc        ON depara(tipo_contrato);
@@ -170,17 +189,21 @@ cur.executemany(
     dep_data
 )
 
+user_data = [(u, SENHA_HASH, n) for u, n in USUARIOS]
+cur.executemany('INSERT INTO users VALUES (?,?,?)', user_data)
+
 con.commit()
 con.close()
 
 # ── Relatório final ───────────────────────────────────────────────────────────
 size_kb = os.path.getsize(DB_PATH) / 1024
-print(f'\n✓ Banco gerado com sucesso!')
+print(f'\nOK Banco gerado com sucesso!')
 print(f'  Arquivo : {DB_PATH}')
 print(f'  Tamanho : {size_kb:.0f} KB')
 print(f'  uar     : {len(uar_data)} linhas')
 print(f'  cc      : {len(cc_data)} linhas')
 print(f'  depara  : {len(dep_data)} linhas')
+print(f'  users   : {len(user_data)} administradores')
 print(f'\nPróximos passos:')
 print(f'  git add db/classes_imo.db')
 print(f'  git commit -m "chore: atualiza banco"')

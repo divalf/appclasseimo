@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — Classe do Ativo IMO</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            sabesp: { cyan: '#00b4d8', navy: '#1a3a5c', dark: '#1D4166' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    [v-cloak] { display: none; }
+
+    .input-yellow {
+      background: #fefce8;
+      border: 1.5px solid #1D4166;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .input-yellow:focus {
+      outline: none;
+      border-color: #00b4d8;
+      box-shadow: 0 0 0 3px rgba(0, 180, 216, 0.2);
+    }
+    .input-yellow::placeholder { color: #94a3b8; font-weight: 400; }
+
+    .input-admin {
+      background: #f8fafc;
+      border: 1.5px solid #cbd5e1;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .input-admin:focus {
+      outline: none;
+      border-color: #00b4d8;
+      box-shadow: 0 0 0 3px rgba(0, 180, 216, 0.2);
+    }
+    .input-admin::placeholder { color: #94a3b8; }
+
+    .ca-box {
+      background: #1a4a6e;
+      border: 3px solid #ffd700;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .ca-box.incompativel {
+      background: #7b1a1a;
+      border-color: #c0392b;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .fade-up { animation: fadeUp 0.25s ease-out; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner {
+      width: 44px; height: 44px;
+      border: 4px solid #e2e8f0;
+      border-top-color: #00b4d8;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    .btn-primary {
+      background: linear-gradient(to bottom, #1e3a5f, #1a3a5c);
+      color: #fde047;
+      border: none;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+      transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
+    }
+    .btn-primary:hover {
+      background: linear-gradient(to bottom, #24486e, #1e3a5f);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.30);
+    }
+    .btn-primary:active  { transform: translateY(2px); box-shadow: 0 1px 4px rgba(0,0,0,0.2); }
+    .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+    .btn-secondary {
+      background: #00b4d8;
+      color: #ffffff;
+      border: none;
+      box-shadow: 0 2px 8px rgba(0,180,216,0.30);
+      transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
+    }
+    .btn-secondary:hover  { background: #0096b5; box-shadow: 0 4px 12px rgba(0,180,216,0.35); }
+    .btn-secondary:active { transform: translateY(2px); box-shadow: 0 1px 4px rgba(0,0,0,0.15); }
+    .btn-secondary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+    .btn-danger {
+      background: #c0392b;
+      color: #fff;
+      border: none;
+      box-shadow: 0 2px 6px rgba(192,57,43,0.3);
+      transition: background 0.15s, transform 0.1s;
+    }
+    .btn-danger:hover  { background: #a93226; }
+    .btn-danger:active { transform: translateY(2px); }
+  </style>
+</head>
+
+<body class="min-h-screen bg-slate-200 font-sans">
+
+  <!-- Spinner de carregamento inicial -->
+  <div id="loading" style="display:none; position:fixed; inset:0; background:rgba(240,244,248,0.95); z-index:200;
+                            flex-direction:column; align-items:center; justify-content:center; gap:14px;">
+    <div class="spinner"></div>
+    <p style="font-family:sans-serif; font-size:0.875rem; color:#475569; font-weight:600; letter-spacing:0.03em;">
+      Carregando banco de dados…
+    </p>
+  </div>
+
+  <div id="app" v-cloak>
+
+    <!-- ══════════════════════════════════════════════════
+         TELA DE LOGIN
+    ══════════════════════════════════════════════════ -->
+    <div v-if="estado === 'login'"
+         class="min-h-screen flex items-center justify-center p-6">
+      <div class="bg-white border-4 border-sabesp-cyan rounded shadow-2xl w-full max-w-sm overflow-hidden fade-up">
+
+        <!-- Cabeçalho do login -->
+        <div class="flex flex-col items-center py-7 px-4" style="background:#1a3a5c">
+          <img src="lgosabesppng2-removebg-preview.png" alt="Logo Sabesp"
+               class="w-20 h-20 object-contain mb-3">
+          <h1 class="text-yellow-300 font-black text-lg tracking-tight">Acesso Administrativo</h1>
+          <p class="text-slate-400 text-xs mt-1 tracking-widest uppercase">
+            GAC — Conformidade de Ativos Regulatórios
+          </p>
+        </div>
+
+        <!-- Formulário -->
+        <div class="px-6 py-6 space-y-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">
+              Usuário
+            </label>
+            <input id="loginUser" v-model="loginUser" type="text"
+                   @keyup.enter="autenticar"
+                   autocomplete="username"
+                   placeholder="seu.usuario"
+                   class="input-admin w-full px-3 py-2.5 text-sm font-semibold text-slate-800 rounded">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">
+              Senha
+            </label>
+            <input v-model="loginPass" type="password"
+                   @keyup.enter="autenticar"
+                   autocomplete="current-password"
+                   placeholder="••••••••"
+                   class="input-admin w-full px-3 py-2.5 text-sm font-semibold text-slate-800 rounded">
+          </div>
+
+          <!-- Mensagem de erro -->
+          <transition name="fade">
+            <div v-if="loginErro"
+                 class="text-red-600 text-xs font-bold text-center bg-red-50 border border-red-200 rounded px-3 py-2">
+              {{ loginErro }}
+            </div>
+          </transition>
+
+          <button @click="autenticar" :disabled="loginProcessando"
+                  class="btn-primary w-full py-2.5 rounded font-bold text-sm uppercase tracking-wider cursor-pointer">
+            {{ loginProcessando ? 'Verificando…' : 'Entrar' }}
+          </button>
+        </div>
+
+        <div class="text-center pb-4">
+          <a href="index-v3.html"
+             class="text-xs text-slate-400 hover:text-sabesp-cyan underline transition-colors">
+            ← Voltar ao aplicativo de consulta
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════
+         APLICATIVO PRINCIPAL + PAINEL ADMIN
+    ══════════════════════════════════════════════════ -->
+    <div v-if="estado === 'app'" class="flex flex-col items-center p-6 gap-4">
+
+      <!-- Barra de sessão -->
+      <div class="w-full max-w-3xl flex items-center justify-between
+                  bg-sabesp-navy text-yellow-300 rounded px-4 py-2 shadow">
+        <span class="text-xs font-bold uppercase tracking-wider">
+          Modo Administrador
+        </span>
+        <span class="text-xs font-semibold text-slate-300">
+          {{ nomeUsuario }}
+        </span>
+        <button @click="sair"
+                class="text-xs text-slate-400 hover:text-red-400 underline transition-colors cursor-pointer bg-transparent border-none">
+          Sair
+        </button>
+      </div>
+
+      <!-- ── Card principal (idêntico ao index-v3.html) ── -->
+      <div class="relative bg-white border-4 border-sabesp-cyan rounded shadow-xl overflow-hidden w-full max-w-3xl">
+
+        <div class="absolute top-0 left-0 z-20 p-2">
+          <img src="lgosabesppng2-removebg-preview.png" alt="Logo Sabesp"
+               class="w-28 h-28 object-contain">
+        </div>
+
+        <header class="relative flex items-center bg-white overflow-hidden" style="height:51px;">
+          <h1 class="absolute inset-0 flex items-center justify-center text-2xl font-black tracking-tight pointer-events-none"
+              style="color:#00b4d8">
+            Definir a Classe do Ativo
+          </h1>
+          <div class="flex-shrink-0 self-stretch overflow-hidden ml-auto">
+            <img src="imgemsuperiordireita.jpg" alt="" class="h-full w-auto block">
+          </div>
+        </header>
+
+        <div class="border-b border-slate-200 bg-slate-50 flex items-center justify-center py-1.5 px-4">
+          <span class="text-xs font-bold tracking-widest uppercase" style="color:#00b4d8">
+            GAC: Conformidade de Ativos Regulatórios
+          </span>
+        </div>
+
+        <transition name="slide">
+          <div v-if="isIncompat"
+               class="flex items-center gap-2 px-4 py-2 bg-red-50 border-b-2 border-red-500 text-red-600 font-bold text-sm fade-up">
+            <span class="text-base">⚠</span>
+            <span>UAR Incompatível com o Centro de Custo</span>
+          </div>
+        </transition>
+
+        <div>
+          <!-- Seção 1: Entradas -->
+          <section class="px-4 pb-3 pt-10 space-y-2 border-b-2 border-sabesp-navy">
+            <div class="grid items-center gap-2" style="grid-template-columns:180px 155px 1fr">
+              <label class="text-sm font-bold text-slate-800">Centro de Custo:</label>
+              <div>
+                <input type="text" v-model="ccInput" list="cc-list"
+                       autocomplete="off" placeholder="Cole ou digite o CC..."
+                       @input="onCCInput"
+                       class="input-yellow w-full px-2 py-1.5 text-sm font-bold text-sabesp-dark rounded text-center">
+                <datalist id="cc-list">
+                  <option v-for="c in CC_DATA" :key="c.cc" :value="c.cc" :label="c.cc + ' – ' + c.descCC"></option>
+                </datalist>
+              </div>
+              <span class="text-sm font-bold truncate pl-1" style="color:#00B4D8">{{ ccDesc }}</span>
+            </div>
+
+            <div class="grid items-center gap-2" style="grid-template-columns:180px 155px 1fr">
+              <label class="text-sm font-bold text-slate-800">UAR:</label>
+              <div>
+                <input type="text" v-model="uarInput" list="uar-list"
+                       autocomplete="off" placeholder="Cole ou digite a UAR..."
+                       @input="onUARInput"
+                       class="input-yellow w-full px-2 py-1.5 text-sm font-bold text-sabesp-dark rounded text-center">
+                <datalist id="uar-list">
+                  <option v-for="u in UAR_DATA" :key="u.code" :value="u.code" :label="u.code + ' – ' + u.desc"></option>
+                </datalist>
+              </div>
+              <span class="text-sm font-bold truncate pl-1" style="color:#00B4D8">{{ uarDesc }}</span>
+            </div>
+
+            <div class="grid items-center gap-2" style="grid-template-columns:180px 155px 1fr">
+              <span class="text-sm font-bold text-slate-800">Tipo de Contrato:</span>
+              <div class="text-sm font-bold text-center" :style="{color: isIncompat ? '#c0392b' : '#00B4D8'}">{{ val(resultado, 'tc') }}</div>
+              <span class="text-sm font-bold pl-1" :style="{color: isIncompat ? '#c0392b' : '#00B4D8'}">{{ val(resultado, 'descTC') }}</span>
+            </div>
+
+            <div class="grid items-center gap-2" style="grid-template-columns:180px 155px 1fr">
+              <span class="text-sm font-bold text-slate-800">Tipo Centro Custo:</span>
+              <div class="text-sm font-bold text-center" :style="{color: isIncompat ? '#c0392b' : '#00B4D8'}">{{ val(resultado, 'tcc') }}</div>
+              <span class="text-sm font-bold pl-1" :style="{color: isIncompat ? '#c0392b' : '#00B4D8'}">{{ val(resultado, 'descTCC') }}</span>
+            </div>
+
+            <div class="grid items-center gap-2" style="grid-template-columns:180px 155px 1fr">
+              <span class="text-sm font-bold text-slate-800">Centro de Lucro:</span>
+              <div class="text-sm font-bold text-center" :style="{color: isIncompat ? '#c0392b' : '#00B4D8'}">{{ val(resultado, 'cl') }}</div>
+              <span class="text-sm font-bold pl-1" :style="{color: isIncompat ? '#c0392b' : '#00B4D8'}">{{ val(resultado, 'descCL') }}</span>
+            </div>
+
+            <div class="flex gap-3 pt-2">
+              <button @click="determinar"
+                      class="btn-primary font-bold text-sm uppercase tracking-wider px-7 py-2 rounded cursor-pointer">
+                Determinar Classe
+              </button>
+              <button @click="limpar"
+                      class="btn-secondary font-bold text-sm uppercase tracking-wider px-7 py-2 rounded cursor-pointer">
+                Limpar
+              </button>
+            </div>
+          </section>
+
+          <!-- Seção 2: FC / GB / UM -->
+          <section class="grid border-b-2 border-sabesp-navy" style="grid-template-columns:30% 1fr 1fr">
+            <div class="border-r border-slate-200">
+              <div class="text-xs font-bold text-slate-600 text-center py-2 border-b border-slate-200 bg-slate-50 uppercase tracking-wide">Forma de Controle</div>
+              <div class="text-sm font-bold text-center py-3" :style="{color: isIncompat ? '#c0392b' : '#00B4D8'}">
+                {{ resultado ? (resultado.fc || '') : '' }}
+              </div>
+            </div>
+            <div class="border-r border-slate-200">
+              <div class="text-xs font-bold text-slate-600 text-center py-2 border-b border-slate-200 bg-slate-50 uppercase tracking-wide">Grupo de Bens</div>
+              <div class="text-sm font-bold text-center py-3" :style="{color: isIncompat ? '#c0392b' : '#00B4D8'}">
+                {{ resultado ? (resultado.gb || '') : '' }}
+              </div>
+            </div>
+            <div>
+              <div class="text-xs font-bold text-slate-600 text-center py-2 border-b border-slate-200 bg-slate-50 uppercase tracking-wide">Unidade de Medida</div>
+              <div class="text-sm font-bold text-center py-3" :style="{color: isIncompat ? '#c0392b' : '#00B4D8'}">
+                {{ resultado ? (resultado.um || '') : '' }}
+              </div>
+            </div>
+          </section>
+
+          <!-- Seção 3: Classe do Ativo -->
+          <section class="grid border-b-2 border-sabesp-navy" style="grid-template-columns:30% 70%">
+            <div class="border-r border-slate-200 flex flex-col">
+              <div class="text-xs font-bold text-slate-600 text-center py-2 border-b border-slate-200 bg-slate-50 uppercase tracking-wide">Classe do Ativo</div>
+              <div class="flex-1 flex items-center justify-center p-3">
+                <div :class="['ca-box rounded w-full flex items-center justify-center px-3 py-3 min-h-[52px]',
+                              isIncompat ? 'incompativel' : '']">
+                  <span :class="['font-black text-lg tracking-wide', isIncompat ? 'text-red-200' : 'text-yellow-300']">
+                    {{ resultado ? (resultado.ca || '') : '' }}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div class="flex flex-col">
+              <div class="text-xs font-bold text-slate-600 text-center py-2 border-b border-slate-200 bg-slate-50 uppercase tracking-wide">Descrição Classe do Ativo Imobilizado</div>
+              <div class="flex-1 flex items-center px-5 py-3 text-sm font-bold leading-snug"
+                   :style="{color: isIncompat ? '#c0392b' : '#00B4D8'}">
+                {{ resultado ? (resultado.descUP || '') : '' }}
+              </div>
+            </div>
+          </section>
+
+          <!-- Seção 4: Rodapé -->
+          <section class="grid relative" style="grid-template-columns:30% 1fr; min-height:72px">
+            <div class="flex items-center justify-center border-r border-slate-200">
+              <span @click="abrirAjuda" @keydown.enter="abrirAjuda" @keydown.space.prevent="abrirAjuda"
+                    tabindex="0" role="button"
+                    class="font-bold text-base cursor-pointer underline underline-offset-2 transition-colors"
+                    style="color:#00b4d8"
+                    onmouseover="this.style.color='#0077b6'"
+                    onmouseout="this.style.color='#00b4d8'">
+                Ajuda
+              </span>
+            </div>
+            <div class="grid" style="grid-template-columns:1fr 1fr; grid-template-rows:auto 1fr">
+              <div class="text-xs font-bold text-slate-600 text-center py-2 border-b border-r border-slate-200 bg-slate-50 uppercase tracking-wide">Matrícula</div>
+              <div class="text-xs font-bold text-slate-600 text-center py-2 border-b border-slate-200 bg-slate-50 uppercase tracking-wide">Nome do Aprovador</div>
+              <div class="text-sm font-bold text-center flex items-center justify-center border-r border-slate-200 py-2 px-2"
+                   :style="{color: isIncompat ? '#c0392b' : '#00B4D8'}">
+                {{ resultado ? (resultado.mat || '') : '' }}
+              </div>
+              <div class="text-sm font-bold text-center flex items-center justify-center py-2 px-2"
+                   :style="{color: isIncompat ? '#c0392b' : '#00B4D8'}">
+                {{ resultado ? (resultado.nomeAprov || '') : '' }}
+              </div>
+            </div>
+            <div class="absolute bottom-2 right-2 opacity-30">
+              <img src="lgosabesp.jpg" alt="" class="w-8 h-8 object-contain">
+            </div>
+          </section>
+        </div>
+      </div><!-- /card principal -->
+
+      <!-- ══════════════════════════════════════════════════
+           PAINEL DO ADMINISTRADOR
+      ══════════════════════════════════════════════════ -->
+      <div class="w-full max-w-3xl bg-white border-4 border-sabesp-navy rounded shadow-xl overflow-hidden">
+
+        <!-- Cabeçalho do painel -->
+        <div class="flex items-center justify-between px-5 py-3" style="background:#1a3a5c">
+          <div class="flex items-center gap-2">
+            <span class="text-yellow-300 font-black text-sm uppercase tracking-wider">
+              Painel do Administrador
+            </span>
+            <span class="text-slate-400 text-xs font-medium">— Atualização do Banco de Dados</span>
+          </div>
+        </div>
+
+        <div class="px-6 py-5 space-y-5">
+
+          <!-- Instrução -->
+          <p class="text-sm text-slate-600 leading-relaxed">
+            Selecione o arquivo <strong class="text-sabesp-dark">CLASSES_IMO.xlsx</strong> atualizado.
+            O sistema converterá a planilha para um novo banco de dados diretamente no navegador.
+            Após o download, substitua o arquivo <code class="bg-slate-100 px-1 rounded text-xs">db/classes_imo.db</code>
+            no servidor ou repositório.
+          </p>
+
+          <!-- Seleção de arquivo -->
+          <div class="flex items-center gap-3">
+            <input type="file" id="fileInput" ref="fileInput"
+                   accept=".xlsx" @change="onArquivo" class="hidden">
+            <label for="fileInput"
+                   class="btn-primary px-5 py-2 rounded font-bold text-sm uppercase tracking-wider cursor-pointer inline-block select-none">
+              Selecionar XLSX
+            </label>
+            <span class="text-sm text-slate-500 truncate max-w-xs">
+              {{ adminArquivoNome || 'Nenhum arquivo selecionado' }}
+            </span>
+          </div>
+
+          <!-- Botão Gerar -->
+          <div v-if="adminArquivo">
+            <button @click="gerarBanco" :disabled="adminProcessando"
+                    class="btn-secondary px-7 py-2 rounded font-bold text-sm uppercase tracking-wider cursor-pointer">
+              {{ adminProcessando ? 'Processando…' : 'Gerar Banco de Dados' }}
+            </button>
+          </div>
+
+          <!-- Status -->
+          <div v-if="adminStatus"
+               :class="['text-sm font-semibold px-4 py-2.5 rounded border fade-up',
+                 adminStatusTipo === 'ok'   ? 'bg-green-50  text-green-700  border-green-200' :
+                 adminStatusTipo === 'erro' ? 'bg-red-50    text-red-700    border-red-200'   :
+                                             'bg-blue-50   text-blue-700   border-blue-200']">
+            {{ adminStatus }}
+          </div>
+
+          <!-- Estatísticas do banco gerado -->
+          <div v-if="adminLinhas.uar > 0"
+               class="grid grid-cols-3 gap-3 text-center fade-up">
+            <div class="bg-slate-50 rounded border border-slate-200 py-3">
+              <div class="text-2xl font-black" style="color:#00b4d8">{{ adminLinhas.uar }}</div>
+              <div class="text-xs text-slate-500 uppercase tracking-wide mt-0.5">UAR</div>
+            </div>
+            <div class="bg-slate-50 rounded border border-slate-200 py-3">
+              <div class="text-2xl font-black" style="color:#00b4d8">{{ adminLinhas.cc }}</div>
+              <div class="text-xs text-slate-500 uppercase tracking-wide mt-0.5">Centros de Custo</div>
+            </div>
+            <div class="bg-slate-50 rounded border border-slate-200 py-3">
+              <div class="text-2xl font-black" style="color:#00b4d8">{{ adminLinhas.depara }}</div>
+              <div class="text-xs text-slate-500 uppercase tracking-wide mt-0.5">DEPARA</div>
+            </div>
+          </div>
+
+          <!-- Link de download -->
+          <div v-if="adminDownloadUrl"
+               class="flex items-center gap-4 bg-green-50 border border-green-200 rounded px-4 py-3 fade-up">
+            <a :href="adminDownloadUrl" download="classes_imo.db"
+               class="btn-primary px-6 py-2 rounded font-bold text-sm uppercase tracking-wider cursor-pointer inline-block text-center">
+              Baixar classes_imo.db
+            </a>
+            <div class="text-xs text-slate-500 leading-relaxed">
+              Substitua o arquivo em <code class="bg-white border border-slate-200 px-1 rounded">db/classes_imo.db</code>
+              e publique no servidor para ativar as atualizações.
+            </div>
+          </div>
+
+        </div>
+      </div><!-- /painel admin -->
+
+    </div><!-- /app principal -->
+
+    <!-- ── MODAL DE AJUDA ── -->
+    <div v-if="showModal"
+         class="fixed inset-0 z-50 flex items-center justify-center"
+         role="dialog" aria-modal="true" aria-labelledby="modal-titulo">
+      <div @click="fecharAjuda" class="absolute inset-0 bg-black/50"></div>
+      <div class="relative bg-white border-4 border-sabesp-cyan rounded shadow-2xl max-w-lg w-11/12 overflow-hidden fade-up">
+        <div class="flex items-center justify-between px-4 py-3 border-b-2 border-sabesp-navy bg-slate-50">
+          <span id="modal-titulo" class="font-black text-sm text-sabesp-dark">
+            Como Determinar a Classe do Ativo — Passo a Passo
+          </span>
+          <button @click="fecharAjuda"
+                  class="text-2xl leading-none text-slate-500 hover:text-red-600 transition-colors cursor-pointer bg-transparent border-none">
+            &times;
+          </button>
+        </div>
+        <ol class="list-decimal px-8 py-5 space-y-3 max-h-96 overflow-y-auto">
+          <li class="text-sm text-slate-700 leading-relaxed">
+            <strong class="text-sabesp-dark">Informe o Centro de Custo (CC):</strong>
+            Cole ou selecione na lista suspensa o código do CC do solicitante.
+          </li>
+          <li class="text-sm text-slate-700 leading-relaxed">
+            <strong class="text-sabesp-dark">Informe a UAR:</strong>
+            Cole ou selecione da lista a Unidade de Adição e Retirada do ativo.
+          </li>
+          <li class="text-sm text-slate-700 leading-relaxed">
+            <strong class="text-sabesp-dark">Clique em "Determinar Classe":</strong>
+            O sistema aplica os critérios e exibe CA, FC, GB e UM.
+          </li>
+          <li class="text-sm text-slate-700 leading-relaxed">
+            <strong class="text-sabesp-dark">Atenção — resultado "Incompatível":</strong>
+            A UAR não é compatível com o CC selecionado. Revise os dois campos.
+          </li>
+          <li class="text-sm text-slate-700 leading-relaxed">
+            <strong class="text-sabesp-dark">Nova consulta — botão "Limpar":</strong>
+            Clique em Limpar para retornar ao estado inicial.
+          </li>
+        </ol>
+      </div>
+    </div>
+
+  </div><!-- /app Vue -->
+
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.2/sql-wasm.js"></script>
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+  <script src="js/logic.js"></script>
+  <script>
+    const { createApp } = Vue;
+
+    // ── Módulo-nível: instância sql.js e banco carregado ─────────────────────────
+    let SQL        = null;
+    let currentDb  = null;
+    let DEPARA_GLB = [];
+
+    // ── Utilitários ──────────────────────────────────────────────────────────────
+    function safe(v) {
+      return (v === null || v === undefined) ? '' : String(v).trim();
+    }
+
+    async function sha256(text) {
+      const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+      return Array.from(new Uint8Array(buf))
+        .map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    function linhas(db, sql, params) {
+      const r = db.exec(sql, params);
+      if (!r.length) return [];
+      const { columns, values } = r[0];
+      return values.map(row =>
+        Object.fromEntries(columns.map((col, i) => [col, row[i]]))
+      );
+    }
+
+    // ── Inicialização: carrega banco e monta Vue ──────────────────────────────────
+    async function inicializar() {
+      const loadingEl = document.getElementById('loading');
+      loadingEl.style.display = 'flex';
+
+      try {
+        SQL = await initSqlJs({
+          locateFile: f => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.2/${f}`
+        });
+
+        const resp = await fetch('db/classes_imo.db');
+        if (!resp.ok) throw new Error(`Banco não encontrado (HTTP ${resp.status})`);
+
+        const buf = await resp.arrayBuffer();
+        currentDb  = new SQL.Database(new Uint8Array(buf));
+
+        loadingEl.style.display = 'none';
+
+        // ── Monta o aplicativo Vue ────────────────────────────────────────────────
+        createApp({
+          data() {
+            return {
+              // Autenticação
+              estado:           'login',
+              loginUser:        '',
+              loginPass:        '',
+              loginErro:        '',
+              loginProcessando: false,
+              nomeUsuario:      '',
+
+              // Dados do app (preenchidos após login)
+              CC_DATA:  [],
+              UAR_DATA: [],
+
+              // Campos do formulário
+              ccInput:   '',
+              uarInput:  '',
+              ccDesc:    '',
+              uarDesc:   '',
+              resultado: null,
+              showModal: false,
+
+              // Painel admin
+              adminArquivo:     null,
+              adminArquivoNome: '',
+              adminStatus:      '',
+              adminStatusTipo:  '',
+              adminProcessando: false,
+              adminDownloadUrl: '',
+              adminLinhas:      { uar: 0, cc: 0, depara: 0 },
+            };
+          },
+
+          computed: {
+            isIncompat() {
+              return this.resultado && this.resultado.ca === 'Incompatível';
+            },
+          },
+
+          methods: {
+            // ── Login ─────────────────────────────────────────────────────────────
+            async autenticar() {
+              if (!this.loginUser.trim() || !this.loginPass) {
+                this.loginErro = 'Preencha o usuário e a senha.';
+                return;
+              }
+              this.loginProcessando = true;
+              this.loginErro = '';
+              try {
+                const hashSenha = await sha256(this.loginPass);
+                const usuario   = this.loginUser.trim().toLowerCase();
+                const r = currentDb.exec(
+                  'SELECT nome FROM users WHERE username=? AND password=?',
+                  [usuario, hashSenha]
+                );
+                if (r.length && r[0].values.length) {
+                  this.nomeUsuario = r[0].values[0][0];
+                  // Carrega as tabelas de dados
+                  this.UAR_DATA = linhas(currentDb,
+                    'SELECT code, desc FROM uar ORDER BY code'
+                  );
+                  this.CC_DATA = linhas(currentDb, `
+                    SELECT cc,
+                           responsavel,
+                           tipo_contrato       AS tipoContrato,
+                           tipo_centro_custo   AS tipoCentroCusto,
+                           centro_lucro        AS centroLucro,
+                           desc_cc             AS descCC,
+                           usuario_responsavel AS usuarioResponsavel
+                    FROM cc
+                  `);
+                  DEPARA_GLB = linhas(currentDb, `
+                    SELECT legado, atual,
+                           tipologia_cc   AS tipologiaCC,
+                           desc_tipologia AS descTipologia,
+                           up,
+                           desc_up        AS descUP,
+                           tipo_contrato  AS tipoContrato,
+                           forma_controle AS formaControle,
+                           tipo_bem       AS tipoBem,
+                           unid_medida    AS unidMedida
+                    FROM depara
+                  `);
+                  this.estado = 'app';
+                } else {
+                  this.loginErro = 'Usuário ou senha incorretos.';
+                }
+              } catch (e) {
+                this.loginErro = 'Erro ao verificar credenciais.';
+              } finally {
+                this.loginProcessando = false;
+              }
+            },
+
+            sair() {
+              this.estado      = 'login';
+              this.loginUser   = '';
+              this.loginPass   = '';
+              this.loginErro   = '';
+              this.nomeUsuario = '';
+              this.CC_DATA     = [];
+              this.UAR_DATA    = [];
+              DEPARA_GLB       = [];
+              this.resultado   = null;
+              this.adminArquivo     = null;
+              this.adminArquivoNome = '';
+              this.adminStatus      = '';
+              this.adminDownloadUrl = '';
+              this.adminLinhas      = { uar: 0, cc: 0, depara: 0 };
+            },
+
+            // ── App de consulta ───────────────────────────────────────────────────
+            val(r, field) {
+              return r ? (r[field] || '') : '';
+            },
+
+            onCCInput() {
+              const v = this.ccInput.trim();
+              if (!v) { this.ccDesc = ''; return; }
+              const found = this.CC_DATA.find(c => c.cc === v);
+              this.ccDesc = found ? found.descCC : 'CC não encontrado';
+            },
+
+            onUARInput() {
+              const v = this.uarInput.trim();
+              if (!v) { this.uarDesc = ''; return; }
+              const f     = formatUAR(v);
+              const found = this.UAR_DATA.find(u => u.code === f);
+              this.uarDesc = found ? found.desc : 'UAR não encontrada';
+            },
+
+            determinar() {
+              const uarVal = this.uarInput.trim();
+              const ccVal  = this.ccInput.trim();
+              if (!uarVal || !ccVal) {
+                alert('Preencha a UAR e o Centro de Custo antes de continuar.');
+                return;
+              }
+              this.resultado = calcularClasse(uarVal, ccVal, this.UAR_DATA, this.CC_DATA, DEPARA_GLB);
+              const cc  = this.CC_DATA.find(c => c.cc === ccVal);
+              this.ccDesc  = cc  ? cc.descCC  : this.ccDesc;
+              const uar = this.UAR_DATA.find(u => u.code === formatUAR(uarVal));
+              this.uarDesc = uar ? uar.desc    : this.uarDesc;
+            },
+
+            limpar() {
+              this.ccInput   = '';
+              this.uarInput  = '';
+              this.ccDesc    = '';
+              this.uarDesc   = '';
+              this.resultado = null;
+              this.$nextTick(() => document.querySelector('#app input')?.focus());
+            },
+
+            abrirAjuda()  { this.showModal = true;  },
+            fecharAjuda() { this.showModal = false; },
+
+            // ── Painel admin: upload e conversão ──────────────────────────────────
+            onArquivo(e) {
+              const file = e.target.files[0];
+              if (!file) return;
+              this.adminArquivo     = file;
+              this.adminArquivoNome = file.name;
+              this.adminStatus      = '';
+              this.adminDownloadUrl = '';
+              this.adminLinhas      = { uar: 0, cc: 0, depara: 0 };
+            },
+
+            async gerarBanco() {
+              if (!this.adminArquivo) return;
+              this.adminProcessando = true;
+              this.adminStatus      = 'Lendo planilha…';
+              this.adminStatusTipo  = 'info';
+              this.adminDownloadUrl = '';
+              this.adminLinhas      = { uar: 0, cc: 0, depara: 0 };
+
+              try {
+                // Lê o xlsx
+                const buf = await this.adminArquivo.arrayBuffer();
+                const wb  = XLSX.read(new Uint8Array(buf), { type: 'array', cellDates: false });
+
+                // ── Aba UAR ────────────────────────────────────────────────────────
+                if (!wb.Sheets['UAR'])
+                  throw new Error('Aba "UAR" não encontrada na planilha.');
+                const rowsUAR = XLSX.utils.sheet_to_json(wb.Sheets['UAR'],
+                  { header: 1, defval: null });
+                const uarData = [];
+                for (const r of rowsUAR.slice(1)) {
+                  if (r[0] == null) continue;
+                  const n = parseInt(r[0]);
+                  if (isNaN(n)) continue;
+                  uarData.push([String(n).padStart(7, '0'), r[1] ? String(r[1]).trim() : '']);
+                }
+
+                // ── Aba Centros de Custo ───────────────────────────────────────────
+                if (!wb.Sheets['Centros de Custo'])
+                  throw new Error('Aba "Centros de Custo" não encontrada na planilha.');
+                const rowsCC = XLSX.utils.sheet_to_json(wb.Sheets['Centros de Custo'],
+                  { header: 1, defval: null });
+                const ccData = [];
+                for (const r of rowsCC.slice(2)) {    // cabeçalho em 2 linhas
+                  if (r[0] == null) continue;
+                  ccData.push([
+                    safe(r[0]),  safe(r[2]),  safe(r[4]),  safe(r[5]),
+                    safe(r[16]), safe(r[20]), r.length > 29 ? safe(r[29]) : ''
+                  ]);
+                }
+
+                // ── Aba DEPARA ─────────────────────────────────────────────────────
+                if (!wb.Sheets['DEPARA'])
+                  throw new Error('Aba "DEPARA" não encontrada na planilha.');
+                const rowsDep = XLSX.utils.sheet_to_json(wb.Sheets['DEPARA'],
+                  { header: 1, defval: null });
+                const depData = [];
+                for (const r of rowsDep.slice(1)) {
+                  if (r[0] == null) continue;
+                  const upRaw = r[4];
+                  const upVal = typeof upRaw === 'number' ? Math.round(upRaw) : 0;
+                  depData.push([
+                    safe(r[0]), safe(r[1]), safe(r[2]), safe(r[3]),
+                    upVal,
+                    safe(r[5]), safe(r[6]), safe(r[7]), safe(r[8]), safe(r[9])
+                  ]);
+                }
+
+                this.adminStatus = `Planilha lida. Criando banco (${uarData.length} UAR · ${ccData.length} CC · ${depData.length} DEPARA)…`;
+
+                // ── Cria novo banco SQLite ─────────────────────────────────────────
+                const newDb = new SQL.Database();
+
+                newDb.run(`CREATE TABLE uar (
+                  code TEXT PRIMARY KEY,
+                  desc TEXT NOT NULL DEFAULT ""
+                )`);
+                newDb.run(`CREATE TABLE cc (
+                  cc                   TEXT PRIMARY KEY,
+                  responsavel          TEXT DEFAULT "",
+                  tipo_contrato        TEXT DEFAULT "",
+                  tipo_centro_custo    TEXT DEFAULT "",
+                  centro_lucro         TEXT DEFAULT "",
+                  desc_cc              TEXT DEFAULT "",
+                  usuario_responsavel  TEXT DEFAULT ""
+                )`);
+                newDb.run(`CREATE TABLE depara (
+                  id             INTEGER PRIMARY KEY AUTOINCREMENT,
+                  legado         TEXT DEFAULT "",
+                  atual          TEXT DEFAULT "",
+                  tipologia_cc   TEXT DEFAULT "",
+                  desc_tipologia TEXT DEFAULT "",
+                  up             INTEGER DEFAULT 0,
+                  desc_up        TEXT DEFAULT "",
+                  tipo_contrato  TEXT DEFAULT "",
+                  forma_controle TEXT DEFAULT "",
+                  tipo_bem       TEXT DEFAULT "",
+                  unid_medida    TEXT DEFAULT ""
+                )`);
+                newDb.run(`CREATE TABLE users (
+                  username TEXT PRIMARY KEY,
+                  password TEXT NOT NULL,
+                  nome     TEXT DEFAULT ""
+                )`);
+                newDb.run('CREATE INDEX idx_depara_up        ON depara(up)');
+                newDb.run('CREATE INDEX idx_depara_tc        ON depara(tipo_contrato)');
+                newDb.run('CREATE INDEX idx_depara_tipologia ON depara(tipologia_cc)');
+                newDb.run('CREATE INDEX idx_depara_atual     ON depara(atual)');
+
+                // Insere dados em transação
+                newDb.run('BEGIN');
+
+                for (const row of uarData)
+                  newDb.run('INSERT INTO uar VALUES (?,?)', row);
+
+                for (const row of ccData)
+                  newDb.run('INSERT INTO cc VALUES (?,?,?,?,?,?,?)', row);
+
+                const sqlDep = `INSERT INTO depara
+                  (legado,atual,tipologia_cc,desc_tipologia,up,desc_up,
+                   tipo_contrato,forma_controle,tipo_bem,unid_medida)
+                  VALUES (?,?,?,?,?,?,?,?,?,?)`;
+                for (const row of depData)
+                  newDb.run(sqlDep, row);
+
+                // Copia usuários do banco atual (preserva senhas e cadastros)
+                const usersRes = currentDb.exec('SELECT username, password, nome FROM users');
+                if (usersRes.length) {
+                  for (const row of usersRes[0].values)
+                    newDb.run('INSERT INTO users VALUES (?,?,?)', row);
+                }
+
+                newDb.run('COMMIT');
+
+                // ── Exporta e gera link de download ───────────────────────────────
+                const data = newDb.export();
+                newDb.close();
+
+                if (this.adminDownloadUrl)
+                  URL.revokeObjectURL(this.adminDownloadUrl);
+
+                const blob = new Blob([data], { type: 'application/octet-stream' });
+                this.adminDownloadUrl = URL.createObjectURL(blob);
+                this.adminLinhas      = { uar: uarData.length, cc: ccData.length, depara: depData.length };
+                this.adminStatus      = `Banco gerado com sucesso — ${uarData.length} UAR · ${ccData.length} CC · ${depData.length} DEPARA`;
+                this.adminStatusTipo  = 'ok';
+
+              } catch (err) {
+                this.adminStatus     = `Erro: ${err.message}`;
+                this.adminStatusTipo = 'erro';
+              } finally {
+                this.adminProcessando = false;
+              }
+            },
+          },
+
+          mounted() {
+            document.addEventListener('keydown', e => {
+              if (e.key === 'Escape') this.fecharAjuda();
+            });
+            this.$nextTick(() => {
+              document.getElementById('loginUser')?.focus();
+            });
+          },
+        }).mount('#app');
+
+      } catch (err) {
+        const el = document.getElementById('loading');
+        el.innerHTML = `
+          <p style="font-family:sans-serif;color:#c0392b;font-weight:700;text-align:center;padding:24px;">
+            Erro ao carregar o banco de dados:<br>
+            <span style="font-weight:400;font-size:0.85rem;">${err.message}</span><br><br>
+            <span style="font-size:0.8rem;color:#64748b;">
+              Execute: <code>python scripts/xlsx_to_sqlite.py</code><br>e recarregue a página.
+            </span>
+          </p>`;
+      }
+    }
+
+    inicializar();
+  </script>
+</body>
+</html>
