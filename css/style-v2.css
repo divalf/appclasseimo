@@ -274,6 +274,21 @@ body {
 .v2-ca-col-right {
   display: flex;
   flex-direction: column;
+  position: relative;
+}
+
+/* Traço vertical a 50% desta coluna (= 65% do card)
+   percorre TODA a altura da seção CA para unir-se ao rodapé */
+.v2-ca-col-right::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+  background: #1a3a5c;
+  pointer-events: none;
+  z-index: 0;
 }
 
 .v2-ca-header {
@@ -283,6 +298,8 @@ body {
   padding: 8px 12px;
   border-bottom: 1px solid #1a3a5c;
   text-align: center;
+  position: relative;
+  z-index: 1;   /* texto fica sobre o traço vertical do pai */
 }
 
 .v2-ca-box {
@@ -321,6 +338,8 @@ body {
   color: #c0392b;
   word-break: break-word;
   min-height: 58px;
+  position: relative;
+  z-index: 1;   /* garante que o texto fica sobre o traço do pai */
 }
 
 /* ── Seção 4: Rodapé (Ajuda + Mat/Nome) ─────────────── */
