@@ -813,6 +813,13 @@
                   this.senhaErro = json.error || 'Erro ao alterar senha.';
                   return;
                 }
+                // Atualiza o db em memória para que o login funcione
+                // sem precisar recarregar a página
+                const newHash = await sha256(this.senhaNova);
+                currentDb.run(
+                  'UPDATE users SET password = ? WHERE username = ?',
+                  [newHash, this.usuarioLogado]
+                );
                 this.senhaMsg     = 'Senha alterada com sucesso!';
                 this.senhaAtual   = '';
                 this.senhaNova    = '';
