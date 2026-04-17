@@ -126,8 +126,11 @@ wb.close()
 os.makedirs(DB_DIR, exist_ok=True)
 
 if os.path.exists(DB_PATH):
+    bak_path = DB_PATH + '.bak'
+    import shutil
+    shutil.copy2(DB_PATH, bak_path)
     os.remove(DB_PATH)
-    print(f'\nBanco anterior removido.')
+    print(f'\nBanco anterior salvo em: {bak_path}')
 
 con = sqlite3.connect(DB_PATH)
 cur = con.cursor()

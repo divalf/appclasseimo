@@ -59,7 +59,7 @@ app.post('/api/change-password', (req, res) => {
 // POST /api/reset-users  — restaura todas as senhas para o valor inicial
 // Requer header  X-Reset-Token: <RESET_TOKEN>  (variável de ambiente)
 const RESET_TOKEN    = process.env.RESET_TOKEN || '';
-const SENHA_INICIAL  = 'SabespS42026';
+const SENHA_INICIAL  = process.env.SENHA_INICIAL || 'SabespS42026';
 const USUARIOS_SEED  = [
   ['jafagundes', 'Jorge Fagundes'],
   ['jmartinez',  'Jorge Martinez'],
@@ -96,7 +96,7 @@ app.post('/api/reset-users', (req, res) => {
       for (const [u, n] of rows) stmt.run(u, hash, n);
     });
     resetAll(USUARIOS_SEED);
-    res.json({ ok: true, usuarios: USUARIOS_SEED.length, senhaInicial: SENHA_INICIAL });
+    res.json({ ok: true, usuarios: USUARIOS_SEED.length });
   } catch (err) {
     res.status(500).json({ error: 'Erro interno: ' + err.message });
   } finally {
