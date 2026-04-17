@@ -1,0 +1,11 @@
+.git
+tests/node_modules
+tests/coverage
+scripts/*.py
+*.xlsx
+*.pptx
+MELHORIALAYOUT*.png
+layoutfinal*.png
+layoutmodelo*.png
+indexbak.html
+docs/
