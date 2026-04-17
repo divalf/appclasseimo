@@ -454,6 +454,62 @@
         </div>
       </div><!-- /painel admin -->
 
+      <!-- ── Painel: Alterar Senha ── -->
+      <div class="bg-white border border-slate-200 rounded-lg shadow-sm w-full max-w-3xl overflow-hidden">
+        <div class="px-6 py-3 border-b border-slate-200 bg-slate-50">
+          <h2 class="text-xs font-black uppercase tracking-widest text-sabesp-dark">Alterar Senha</h2>
+        </div>
+        <div class="px-6 py-5 space-y-3 max-w-sm">
+
+          <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">Senha Atual</label>
+            <input v-model="senhaAtual" type="password" placeholder="••••••••"
+                   class="input-admin w-full px-3 py-2.5 text-sm font-semibold text-slate-800 rounded">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">Nova Senha</label>
+            <input v-model="senhaNova" type="password" placeholder="••••••••"
+                   class="input-admin w-full px-3 py-2.5 text-sm font-semibold text-slate-800 rounded">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">Confirmar Nova Senha</label>
+            <input v-model="senhaConfirm" type="password" placeholder="••••••••"
+                   @keyup.enter="alterarSenha"
+                   class="input-admin w-full px-3 py-2.5 text-sm font-semibold text-slate-800 rounded">
+          </div>
+
+          <transition name="fade">
+            <div v-if="senhaErro"
+                 class="text-red-600 text-xs font-bold bg-red-50 border border-red-200 rounded px-3 py-2">
+              {{ senhaErro }}
+            </div>
+          </transition>
+          <transition name="fade">
+            <div v-if="senhaMsg"
+                 class="text-green-700 text-xs font-semibold bg-green-50 border border-green-200 rounded px-3 py-2">
+              {{ senhaMsg }}
+            </div>
+          </transition>
+
+          <button @click="alterarSenha" :disabled="senhaProcessando"
+                  class="btn-primary px-6 py-2.5 rounded font-bold text-sm uppercase tracking-wider cursor-pointer">
+            {{ senhaProcessando ? 'Alterando…' : 'Alterar Senha' }}
+          </button>
+
+          <div v-if="senhaDownloadUrl"
+               class="flex items-center gap-3 bg-green-50 border border-green-200 rounded px-4 py-3 fade-up">
+            <a :href="senhaDownloadUrl" download="classes_imo.db"
+               class="btn-secondary px-5 py-2 rounded font-bold text-xs uppercase tracking-wider cursor-pointer inline-block text-center">
+              Baixar DB Atualizado
+            </a>
+            <span class="text-xs text-slate-500 leading-relaxed">
+              Substitua em <code class="bg-white border border-slate-200 px-1 rounded">db/classes_imo.db</code> no servidor.
+            </span>
+          </div>
+
+        </div>
+      </div><!-- /alterar senha -->
+
     </div><!-- /app principal -->
 
     <!-- ── MODAL DE AJUDA ── -->
@@ -559,6 +615,17 @@
               loginErro:        '',
               loginProcessando: false,
               nomeUsuario:      '',
+              usuarioLogado:    '',
+
+              // Alterar senha
+              senhaAtual:       '',
+              senhaNova:        '',
+              senhaConfirm:     '',
+              senhaErro:        '',
+              senhaMsg:         '',
+              senhaMsgTipo:     '',
+              senhaProcessando: false,
+              senhaDownloadUrl: '',
 
               // Dados do app (preenchidos após login)
               CC_DATA:  [],
@@ -606,7 +673,8 @@
                   [usuario, hashSenha]
                 );
                 if (r.length && r[0].values.length) {
-                  this.nomeUsuario = r[0].values[0][0];
+                  this.nomeUsuario   = r[0].values[0][0];
+                  this.usuarioLogado = usuario;
                   // Carrega as tabelas de dados
                   this.UAR_DATA = linhas(currentDb,
                     'SELECT code, desc FROM uar ORDER BY code'
@@ -645,20 +713,27 @@
             },
 
             sair() {
-              this.estado      = 'login';
-              this.loginUser   = '';
-              this.loginPass   = '';
-              this.loginErro   = '';
-              this.nomeUsuario = '';
-              this.CC_DATA     = [];
-              this.UAR_DATA    = [];
-              DEPARA_GLB       = [];
-              this.resultado   = null;
+              this.estado        = 'login';
+              this.loginUser     = '';
+              this.loginPass     = '';
+              this.loginErro     = '';
+              this.nomeUsuario   = '';
+              this.usuarioLogado = '';
+              this.CC_DATA       = [];
+              this.UAR_DATA      = [];
+              DEPARA_GLB         = [];
+              this.resultado     = null;
               this.adminArquivo     = null;
               this.adminArquivoNome = '';
               this.adminStatus      = '';
               this.adminDownloadUrl = '';
               this.adminLinhas      = { uar: 0, cc: 0, depara: 0 };
+              this.senhaAtual       = '';
+              this.senhaNova        = '';
+              this.senhaConfirm     = '';
+              this.senhaErro        = '';
+              this.senhaMsg         = '';
+              this.senhaDownloadUrl = '';
             },
 
             // ── App de consulta ───────────────────────────────────────────────────
@@ -716,6 +791,59 @@
               this.adminStatus      = '';
               this.adminDownloadUrl = '';
               this.adminLinhas      = { uar: 0, cc: 0, depara: 0 };
+            },
+
+            // ── Alterar senha ─────────────────────────────────────────────────────
+            async alterarSenha() {
+              this.senhaErro        = '';
+              this.senhaMsg         = '';
+              this.senhaDownloadUrl = '';
+
+              if (!this.senhaAtual || !this.senhaNova || !this.senhaConfirm) {
+                this.senhaErro = 'Preencha todos os campos.';
+                return;
+              }
+              if (this.senhaNova !== this.senhaConfirm) {
+                this.senhaErro = 'A nova senha e a confirmação não coincidem.';
+                return;
+              }
+              if (this.senhaNova.length < 6) {
+                this.senhaErro = 'A nova senha deve ter pelo menos 6 caracteres.';
+                return;
+              }
+
+              this.senhaProcessando = true;
+              try {
+                const hashAtual = await sha256(this.senhaAtual);
+                const r = currentDb.exec(
+                  'SELECT username FROM users WHERE username=? AND password=?',
+                  [this.usuarioLogado, hashAtual]
+                );
+                if (!r.length || !r[0].values.length) {
+                  this.senhaErro = 'Senha atual incorreta.';
+                  return;
+                }
+
+                const hashNova = await sha256(this.senhaNova);
+                currentDb.run(
+                  'UPDATE users SET password=? WHERE username=?',
+                  [hashNova, this.usuarioLogado]
+                );
+
+                const data = currentDb.export();
+                if (this.senhaDownloadUrl) URL.revokeObjectURL(this.senhaDownloadUrl);
+                const blob = new Blob([data], { type: 'application/octet-stream' });
+                this.senhaDownloadUrl = URL.createObjectURL(blob);
+                this.senhaMsg     = 'Senha alterada. Baixe o banco atualizado e publique no servidor.';
+                this.senhaMsgTipo = 'ok';
+                this.senhaAtual   = '';
+                this.senhaNova    = '';
+                this.senhaConfirm = '';
+              } catch (e) {
+                this.senhaErro = 'Erro ao alterar senha: ' + e.message;
+              } finally {
+                this.senhaProcessando = false;
+              }
             },
 
             async gerarBanco() {
