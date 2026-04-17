@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - PORT=3000
+    restart: unless-stopped
+    volumes:
+      - db-data:/app/db
+
+volumes:
+  db-data:
