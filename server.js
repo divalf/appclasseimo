@@ -9,6 +9,13 @@ const PORT    = process.env.PORT || 3000;
 const DB_PATH = path.join(__dirname, 'db', 'classes_imo.db');
 
 app.use(express.json());
+
+// Banco de dados: sem cache — garante que o browser sempre busque a versão atual
+app.use('/db', (req, res, next) => {
+  res.setHeader('Cache-Control', 'no-store');
+  next();
+}, express.static(path.join(__dirname, 'db')));
+
 app.use(express.static(__dirname, { index: 'index.html' }));
 
 function sha256(text) {
