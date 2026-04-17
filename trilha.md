@@ -147,9 +147,12 @@ Vue não processava o `v-if`, então o modal aparecia sempre visível e os event
 
 <!-- Tailwind CSS -->
 <script src="https://cdn.tailwindcss.com"></script>
+
+<!-- sql.js (SQLite no browser) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.2/sql-wasm.js"></script>
 ```
 
-Ambas carregadas via CDN — **sem build step, sem npm, sem instalação local**.
+Todas carregadas via CDN — **sem build step, sem npm, sem instalação local**.
 
 ---
 
@@ -165,3 +168,109 @@ Ambas carregadas via CDN — **sem build step, sem npm, sem instalação local**
 | Texto amarelo (CA box) | Classe do Ativo | `#fde047` |
 | Fundo CA box | Azul escuro | `#1a4a6e` |
 | Fundo CA incompatível | Vermelho escuro | `#7b1a1a` |
+
+---
+
+## 11. Migração de dados: `data.js` → SQLite
+
+**Motivação:** `js/data.js` embutia ~3.500 linhas de JSON no HTML — carregamento lento e difícil de atualizar.
+
+**Solução:** banco SQLite gerado via `scripts/xlsx_to_sqlite.py`, servido como `db/classes_imo.db` e carregado no browser via **sql.js**.
+
+### Tabelas criadas
+
+| Tabela | Origem | Colunas principais |
+|---|---|---|
+| `uar` | Aba UAR | `code`, `desc` |
+| `cc` | Aba Centros de Custo | `cc`, `responsavel`, `tipo_contrato`, `tipo_centro_custo`, `centro_lucro`, `desc_cc`, `usuario_responsavel` |
+| `depara` | Aba DEPARA | `legado`, `atual`, `tipologia_cc`, `up`, `desc_up`, `tipo_contrato`, `forma_controle`, `tipo_bem`, `unid_medida` |
+
+### Fluxo de carregamento no browser
+
+```
+initSqlJs() → fetch('db/classes_imo.db') → new SQL.Database(buffer) → db.exec(SQL) → arrays JS
+```
+
+- Spinner exibido durante o carregamento (`#loading` com `position:fixed`)
+- Em caso de erro (banco não encontrado), mensagem orientando a rodar o script Python
+- Banco fechado após extração (`db.close()`) para liberar memória
+
+### Aliases SQL → mesmos nomes do `data.js`
+
+Os campos foram renomeados via `AS` no SELECT para manter compatibilidade total com `js/logic.js`:
+
+```sql
+tipo_contrato AS tipoContrato, tipo_centro_custo AS tipoCentroCusto, ...
+```
+
+---
+
+## 12. Painel Administrativo (`admin.html`)
+
+**Objetivo:** permitir regenerar o banco SQLite diretamente no browser a partir de um arquivo `.xlsx`, sem depender do Python.
+
+### Funcionalidades
+
+- **Tela de login** — credenciais hardcoded no HTML (uso interno, sem servidor); bloqueia acesso direto ao painel.
+- **Barra de sessão** — exibe nome do usuário logado e botão "Sair".
+- **Card de consulta idêntico ao `index-v3.html`** — o admin também pode fazer consultas normais.
+- **Painel de administração** (abaixo do card) — seção exclusiva com:
+  - Upload de arquivo `.xlsx`
+  - Geração do banco SQLite no browser via **SheetJS (xlsx)** + **sql.js**
+  - Download automático do `classes_imo.db` gerado
+  - Indicadores de status (processando, sucesso, erro)
+
+### Fluxo de geração do banco no browser
+
+```
+<input file> → FileReader.readAsArrayBuffer() → XLSX.read() 
+  → extrai abas UAR / Centros de Custo / DEPARA
+  → SQL.Database() → CREATE TABLE + INSERT (em transação única)
+  → db.export() → Blob → link de download automático
+```
+
+### Credenciais de acesso
+
+Definidas como constante no HTML (uso interno):
+
+```javascript
+const CREDENCIAIS = { admin: 'sabesp@2025' };
+```
+
+---
+
+## 13. Refatoração do Header (2026-04-17)
+
+**Problema:** header com logo de 112px posicionado de forma absoluta causava sobreposição no conteúdo, exigindo `padding-top: 40px` de compensação no formulário. GAC era uma barra separada com fundo `slate-50`.
+
+**Referência visual:** `layoutfinal01.png`, `layoutfinal02.png`, `layoutfinal03.png`, `hero.png`.
+
+### Mudanças aplicadas
+
+| Elemento | Antes | Depois |
+|---|---|---|
+| Logo | `lgosabesppng2-removebg-preview.png`, 112px, `position:absolute` | `logopng.png`, 48px (`h-12`), dentro do fluxo do header |
+| Header altura | `51px` | `72px` |
+| GAC | `<div>` separado com `bg-slate-50` + `border-b` | `<p>` dentro do header, sobre fundo branco |
+| Padding formulário | `pt-10` (40px de compensação) | `pt-4` (16px normal) |
+| Logo rodapé | `lgosabesp.jpg` | `logopng.png` (consistência) |
+
+### Estrutura do header após refatoração
+
+```html
+<header style="height:72px;">
+  <!-- Logo: contido no header, sem overflow -->
+  <img src="logopng.png" class="h-12">
+
+  <!-- Título + GAC: absolutamente centrados -->
+  <div class="absolute inset-0 flex flex-col items-center justify-center">
+    <h1>Definir a Classe do Ativo</h1>
+    <p>GAC: Conformidade de Ativos Regulatórios</p>
+  </div>
+
+  <!-- Elemento decorativo -->
+  <img src="imgemsuperiordireita.jpg" class="ml-auto h-full">
+</header>
+```
+
+As mesmas mudanças foram replicadas em `admin.html`.

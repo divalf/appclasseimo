@@ -5,6 +5,7 @@ services:
       dockerfile: Dockerfile
     environment:
       - PORT=3000
+      - RESET_TOKEN=reset-sabesp-2026
     restart: unless-stopped
     volumes:
       - db-data:/app/db

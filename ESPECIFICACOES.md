@@ -247,19 +247,30 @@ Critérios para definição das Classes de Imobilizado:
 
 1. Substitua o logo superior esquerdo atual pelo logo da imagem: "C:\\Users\\Wayon\\OneDrive - WAYON IT SOLUTIONS\\Documentos\\claude\_cowork\\02 Projects\\APP Classe IMO\\lgosabesppng2-removebg-preview.png"
 2. Remova a linha horizontal no topo, logo abaixo do texto "Definir a Classe do Ativo"
-3. Centralize o Texto ". GAC: CONFORMIDADE DE ATIVOS REGULATÓRIOS" em relação às bordas verticais e retire o "." da grafia final
+3. Centralize o Texto "Definir a Classe do Ativo" em relação às bordas verticais
+4. Centralize o Texto ". GAC: CONFORMIDADE DE ATIVOS REGULATÓRIOS" em relação às bordas verticais e retire o "." da grafia final
 
 
 
 
 
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+
+https://appclasseimo-classeimo.3d9cmf.easypanel.host
+
+
+
+https://appclasseimo-classeimo.3d9cmf.easypanel.host/admin.html
+
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
 
 
-
-
-Lottie, Three.js, Tailwind CSS, 
 
 
 
