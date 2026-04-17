@@ -2,7 +2,6 @@
 const express  = require('express');
 const path     = require('path');
 const crypto   = require('crypto');
-const fs       = require('fs');
 const Database = require('better-sqlite3');
 
 const app     = express();
@@ -27,9 +26,6 @@ function sha256(text) {
 app.post('/api/change-password', (req, res) => {
   const { username, currentPassword, newPassword } = req.body ?? {};
 
-  console.log('[change-password] DB_PATH:', DB_PATH);
-  console.log('[change-password] Arquivo existe:', fs.existsSync(DB_PATH));
-
   if (!username || !currentPassword || !newPassword) {
     return res.status(400).json({ error: 'Campos obrigatórios.' });
   }
@@ -46,26 +42,14 @@ app.post('/api/change-password', (req, res) => {
     ).get(username, sha256(currentPassword));
 
     if (!row) {
-      console.log('[change-password] Senha atual incorreta para usuário:', username);
       return res.status(401).json({ error: 'Senha atual incorreta.' });
     }
-
-    const statBefore = fs.statSync(DB_PATH);
-    console.log('[change-password] mtime ANTES:', statBefore.mtimeMs);
 
     db.prepare('UPDATE users SET password = ? WHERE username = ?')
       .run(sha256(newPassword), username);
 
-    db.close();
-    db = null;
-
-    const statAfter = fs.statSync(DB_PATH);
-    console.log('[change-password] mtime DEPOIS:', statAfter.mtimeMs);
-    console.log('[change-password] Arquivo modificado:', statAfter.mtimeMs > statBefore.mtimeMs);
-
     res.json({ ok: true });
   } catch (err) {
-    console.error('[change-password] ERRO:', err.message);
     res.status(500).json({ error: 'Erro interno: ' + err.message });
   } finally {
     db?.close();
