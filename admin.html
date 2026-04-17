@@ -496,17 +496,6 @@
             {{ senhaProcessando ? 'Alterando…' : 'Alterar Senha' }}
           </button>
 
-          <div v-if="senhaDownloadUrl"
-               class="flex items-center gap-3 bg-green-50 border border-green-200 rounded px-4 py-3 fade-up">
-            <a :href="senhaDownloadUrl" download="classes_imo.db"
-               class="btn-secondary px-5 py-2 rounded font-bold text-xs uppercase tracking-wider cursor-pointer inline-block text-center">
-              Baixar DB Atualizado
-            </a>
-            <span class="text-xs text-slate-500 leading-relaxed">
-              Substitua em <code class="bg-white border border-slate-200 px-1 rounded">db/classes_imo.db</code> no servidor.
-            </span>
-          </div>
-
         </div>
       </div><!-- /alterar senha -->
 
@@ -623,9 +612,7 @@
               senhaConfirm:     '',
               senhaErro:        '',
               senhaMsg:         '',
-              senhaMsgTipo:     '',
               senhaProcessando: false,
-              senhaDownloadUrl: '',
 
               // Dados do app (preenchidos após login)
               CC_DATA:  [],
@@ -728,12 +715,11 @@
               this.adminStatus      = '';
               this.adminDownloadUrl = '';
               this.adminLinhas      = { uar: 0, cc: 0, depara: 0 };
-              this.senhaAtual       = '';
-              this.senhaNova        = '';
-              this.senhaConfirm     = '';
-              this.senhaErro        = '';
-              this.senhaMsg         = '';
-              this.senhaDownloadUrl = '';
+              this.senhaAtual   = '';
+              this.senhaNova    = '';
+              this.senhaConfirm = '';
+              this.senhaErro    = '';
+              this.senhaMsg     = '';
             },
 
             // ── App de consulta ───────────────────────────────────────────────────
@@ -795,9 +781,8 @@
 
             // ── Alterar senha ─────────────────────────────────────────────────────
             async alterarSenha() {
-              this.senhaErro        = '';
-              this.senhaMsg         = '';
-              this.senhaDownloadUrl = '';
+              this.senhaErro = '';
+              this.senhaMsg  = '';
 
               if (!this.senhaAtual || !this.senhaNova || !this.senhaConfirm) {
                 this.senhaErro = 'Preencha todos os campos.';
@@ -814,33 +799,26 @@
 
               this.senhaProcessando = true;
               try {
-                const hashAtual = await sha256(this.senhaAtual);
-                const r = currentDb.exec(
-                  'SELECT username FROM users WHERE username=? AND password=?',
-                  [this.usuarioLogado, hashAtual]
-                );
-                if (!r.length || !r[0].values.length) {
-                  this.senhaErro = 'Senha atual incorreta.';
+                const resp = await fetch('/api/change-password', {
+                  method:  'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body:    JSON.stringify({
+                    username:        this.usuarioLogado,
+                    currentPassword: this.senhaAtual,
+                    newPassword:     this.senhaNova,
+                  }),
+                });
+                const json = await resp.json();
+                if (!resp.ok) {
+                  this.senhaErro = json.error || 'Erro ao alterar senha.';
                   return;
                 }
-
-                const hashNova = await sha256(this.senhaNova);
-                currentDb.run(
-                  'UPDATE users SET password=? WHERE username=?',
-                  [hashNova, this.usuarioLogado]
-                );
-
-                const data = currentDb.export();
-                if (this.senhaDownloadUrl) URL.revokeObjectURL(this.senhaDownloadUrl);
-                const blob = new Blob([data], { type: 'application/octet-stream' });
-                this.senhaDownloadUrl = URL.createObjectURL(blob);
-                this.senhaMsg     = 'Senha alterada. Baixe o banco atualizado e publique no servidor.';
-                this.senhaMsgTipo = 'ok';
+                this.senhaMsg     = 'Senha alterada com sucesso!';
                 this.senhaAtual   = '';
                 this.senhaNova    = '';
                 this.senhaConfirm = '';
               } catch (e) {
-                this.senhaErro = 'Erro ao alterar senha: ' + e.message;
+                this.senhaErro = 'Erro de conexão com o servidor.';
               } finally {
                 this.senhaProcessando = false;
               }

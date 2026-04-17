@@ -1,6 +1,5 @@
 .git
-tests/node_modules
-tests/coverage
+tests/
 scripts/*.py
 *.xlsx
 *.pptx
