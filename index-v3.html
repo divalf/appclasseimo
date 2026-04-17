@@ -105,31 +105,27 @@
     <!-- ── Card principal ── -->
     <div class="relative bg-white border-4 border-sabesp-cyan rounded shadow-xl overflow-hidden">
 
-      <!-- Logo: absoluta no canto superior esquerdo, dobro do tamanho original -->
-      <div class="absolute top-0 left-0 z-20 p-2">
-        <img src="lgosabesppng2-removebg-preview.png" alt="Logo Sabesp" class="w-28 h-28 object-contain">
-      </div>
-
-      <!-- HEADER: sem borda inferior; título centralizado em relação às bordas verticais do card -->
-      <header class="relative flex items-center bg-white overflow-hidden"
-              style="height:51px;">
-        <!-- Título absolutamente centrado sobre toda a largura do header -->
-        <h1 class="absolute inset-0 flex items-center justify-center text-2xl font-black tracking-tight pointer-events-none"
-            style="color:#00b4d8">
-          Definir a Classe do Ativo
-        </h1>
-        <!-- Imagem decorativa: empurrada para a direita via ml-auto -->
+      <!-- HEADER: logo + título + GAC + elemento decorativo -->
+      <header class="relative flex items-center bg-white overflow-hidden border-b border-slate-100"
+              style="height:72px;">
+        <!-- Logo: contido no header -->
+        <div class="flex-shrink-0 h-full flex items-center px-3 z-10">
+          <img src="logopng.png" alt="Logo Sabesp" class="h-12 w-auto object-contain">
+        </div>
+        <!-- Título + GAC: absolutamente centrados sobre toda a largura -->
+        <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+          <h1 class="text-2xl font-black tracking-tight leading-tight" style="color:#00b4d8">
+            Definir a Classe do Ativo
+          </h1>
+          <p class="text-xs font-bold uppercase mt-1" style="color:#00b4d8; letter-spacing:0.09em;">
+            GAC: Conformidade de Ativos Regulatórios
+          </p>
+        </div>
+        <!-- Imagem decorativa: empurrada para a direita -->
         <div class="flex-shrink-0 self-stretch overflow-hidden ml-auto">
           <img src="imgemsuperiordireita.jpg" alt="" class="h-full w-auto block">
         </div>
       </header>
-
-      <!-- BANNER GAC: centralizado em relação às bordas verticais, sem bullet -->
-      <div class="border-b border-slate-200 bg-slate-50 flex items-center justify-center py-1.5 px-4">
-        <span class="text-xs font-bold tracking-widest uppercase" style="color:#00b4d8">
-          GAC: Conformidade de Ativos Regulatórios
-        </span>
-      </div>
 
       <!-- ALERTA INCOMPATÍVEL -->
       <transition name="slide">
@@ -144,8 +140,7 @@
       <div>
 
         <!-- ── Seção 1: Entradas ── -->
-        <!-- pt-10 = 40px: compensa os 39px que a logo (112px) sobressai abaixo do header (51px) + GAC (22px) -->
-        <section class="px-4 pb-3 pt-10 space-y-2 border-b-2 border-sabesp-navy">
+        <section class="px-4 pb-3 pt-4 space-y-2 border-b-2 border-sabesp-navy">
 
           <!-- Centro de Custo -->
           <div class="grid items-center gap-2" style="grid-template-columns:180px 155px 1fr">
@@ -297,8 +292,8 @@
             </div>
           </div>
           <!-- Logo rodapé -->
-          <div class="absolute bottom-2 right-2 opacity-30">
-            <img src="lgosabesp.jpg" alt="" class="w-8 h-8 object-contain">
+          <div class="absolute bottom-2 right-2 opacity-25">
+            <img src="logopng.png" alt="" class="w-7 h-7 object-contain">
           </div>
         </section>
 
