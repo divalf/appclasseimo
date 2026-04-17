@@ -5,7 +5,8 @@ services:
       dockerfile: Dockerfile
     environment:
       - PORT=3000
-      - RESET_TOKEN=reset-sabesp-2026
+      # RESET_TOKEN e SENHA_INICIAL devem ser configurados no painel do EasyPanel
+      # Nunca commitar credenciais aqui
     restart: unless-stopped
     volumes:
       - db-data:/app/db

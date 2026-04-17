@@ -12,11 +12,11 @@ WORKDIR /app
 # Dependências compiladas
 COPY --from=builder /app/node_modules ./node_modules
 
-# Banco inicial como seed (fora do ponto de montagem do volume)
+# Banco público como seed (copiado antes do COPY geral para ter path explícito)
 COPY db/classes_imo.db /db-seed/classes_imo.db
 
-# Arquivos do app
-COPY . .
+# Arquivos do app (db/ virá do volume em runtime — não precisa estar na imagem)
+COPY --exclude=db . .
 
 RUN chmod +x entrypoint.sh
 

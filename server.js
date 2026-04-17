@@ -4,23 +4,52 @@ const path     = require('path');
 const crypto   = require('crypto');
 const Database = require('better-sqlite3');
 
-const app     = express();
-const PORT    = process.env.PORT || 3000;
-const DB_PATH = path.join(__dirname, 'db', 'classes_imo.db');
+const app          = express();
+const PORT         = process.env.PORT || 3000;
+const DB_PATH      = path.join(__dirname, 'db', 'classes_imo.db');
+const AUTH_DB_PATH = path.join(__dirname, 'db', 'auth.db');
 
 app.use(express.json());
 
-// Banco de dados: sem cache — garante que o browser sempre busque a versão atual
-app.use('/db', (req, res, next) => {
+// Serve apenas classes_imo.db — auth.db nunca é exposto
+app.get('/db/classes_imo.db', (req, res) => {
   res.setHeader('Cache-Control', 'no-store');
-  next();
-}, express.static(path.join(__dirname, 'db')));
+  res.sendFile(DB_PATH);
+});
 
 app.use(express.static(__dirname, { index: 'index.html' }));
 
 function sha256(text) {
   return crypto.createHash('sha256').update(text, 'utf8').digest('hex');
 }
+
+function openAuth() {
+  return new Database(AUTH_DB_PATH);
+}
+
+// POST /api/login
+app.post('/api/login', (req, res) => {
+  const { username, password } = req.body ?? {};
+
+  if (!username || !password) {
+    return res.status(400).json({ error: 'Campos obrigatórios.' });
+  }
+
+  let db;
+  try {
+    db = openAuth();
+    const row = db.prepare(
+      'SELECT nome FROM users WHERE username = ? AND password = ?'
+    ).get(username.trim().toLowerCase(), sha256(password));
+
+    if (!row) return res.status(401).json({ error: 'Usuário ou senha incorretos.' });
+    res.json({ ok: true, nome: row.nome });
+  } catch (err) {
+    res.status(500).json({ error: 'Erro interno: ' + err.message });
+  } finally {
+    db?.close();
+  }
+});
 
 // POST /api/change-password
 app.post('/api/change-password', (req, res) => {
@@ -35,15 +64,13 @@ app.post('/api/change-password', (req, res) => {
 
   let db;
   try {
-    db = new Database(DB_PATH);
+    db = openAuth();
 
     const row = db.prepare(
       'SELECT username FROM users WHERE username = ? AND password = ?'
     ).get(username, sha256(currentPassword));
 
-    if (!row) {
-      return res.status(401).json({ error: 'Senha atual incorreta.' });
-    }
+    if (!row) return res.status(401).json({ error: 'Senha atual incorreta.' });
 
     db.prepare('UPDATE users SET password = ? WHERE username = ?')
       .run(sha256(newPassword), username);
@@ -56,11 +83,10 @@ app.post('/api/change-password', (req, res) => {
   }
 });
 
-// POST /api/reset-users  — restaura todas as senhas para o valor inicial
-// Requer header  X-Reset-Token: <RESET_TOKEN>  (variável de ambiente)
-const RESET_TOKEN    = process.env.RESET_TOKEN || '';
-const SENHA_INICIAL  = process.env.SENHA_INICIAL || 'SabespS42026';
-const USUARIOS_SEED  = [
+// POST /api/reset-users — requer header X-Reset-Token (variável de ambiente)
+const RESET_TOKEN   = process.env.RESET_TOKEN || '';
+const SENHA_INICIAL = process.env.SENHA_INICIAL || 'SabespS42026';
+const USUARIOS_SEED = [
   ['jafagundes', 'Jorge Fagundes'],
   ['jmartinez',  'Jorge Martinez'],
   ['pnishiyama', 'Patrick Nishiyama'],
@@ -81,7 +107,7 @@ app.post('/api/reset-users', (req, res) => {
   const hash = sha256(SENHA_INICIAL);
   let db;
   try {
-    db = new Database(DB_PATH);
+    db = openAuth();
     db.exec(`
       CREATE TABLE IF NOT EXISTS users (
         username TEXT PRIMARY KEY,
@@ -89,9 +115,7 @@ app.post('/api/reset-users', (req, res) => {
         nome     TEXT DEFAULT ""
       )
     `);
-    const stmt = db.prepare(
-      'INSERT OR REPLACE INTO users (username, password, nome) VALUES (?, ?, ?)'
-    );
+    const stmt    = db.prepare('INSERT OR REPLACE INTO users (username, password, nome) VALUES (?, ?, ?)');
     const resetAll = db.transaction((rows) => {
       for (const [u, n] of rows) stmt.run(u, hash, n);
     });

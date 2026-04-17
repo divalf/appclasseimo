@@ -653,47 +653,50 @@
               this.loginProcessando = true;
               this.loginErro = '';
               try {
-                const hashSenha = await sha256(this.loginPass);
-                const usuario   = this.loginUser.trim().toLowerCase();
-                const r = currentDb.exec(
-                  'SELECT nome FROM users WHERE username=? AND password=?',
-                  [usuario, hashSenha]
-                );
-                if (r.length && r[0].values.length) {
-                  this.nomeUsuario   = r[0].values[0][0];
-                  this.usuarioLogado = usuario;
-                  // Carrega as tabelas de dados
-                  this.UAR_DATA = linhas(currentDb,
-                    'SELECT code, desc FROM uar ORDER BY code'
-                  );
-                  this.CC_DATA = linhas(currentDb, `
-                    SELECT cc,
-                           responsavel,
-                           tipo_contrato       AS tipoContrato,
-                           tipo_centro_custo   AS tipoCentroCusto,
-                           centro_lucro        AS centroLucro,
-                           desc_cc             AS descCC,
-                           usuario_responsavel AS usuarioResponsavel
-                    FROM cc
-                  `);
-                  DEPARA_GLB = linhas(currentDb, `
-                    SELECT legado, atual,
-                           tipologia_cc   AS tipologiaCC,
-                           desc_tipologia AS descTipologia,
-                           up,
-                           desc_up        AS descUP,
-                           tipo_contrato  AS tipoContrato,
-                           forma_controle AS formaControle,
-                           tipo_bem       AS tipoBem,
-                           unid_medida    AS unidMedida
-                    FROM depara
-                  `);
-                  this.estado = 'app';
-                } else {
-                  this.loginErro = 'Usuário ou senha incorretos.';
+                const resp = await fetch('/api/login', {
+                  method:  'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body:    JSON.stringify({
+                    username: this.loginUser.trim().toLowerCase(),
+                    password: this.loginPass,
+                  }),
+                });
+                const json = await resp.json();
+                if (!resp.ok) {
+                  this.loginErro = json.error || 'Usuário ou senha incorretos.';
+                  return;
                 }
+                this.nomeUsuario   = json.nome;
+                this.usuarioLogado = this.loginUser.trim().toLowerCase();
+                // Carrega as tabelas de dados do banco público
+                this.UAR_DATA = linhas(currentDb,
+                  'SELECT code, desc FROM uar ORDER BY code'
+                );
+                this.CC_DATA = linhas(currentDb, `
+                  SELECT cc,
+                         responsavel,
+                         tipo_contrato       AS tipoContrato,
+                         tipo_centro_custo   AS tipoCentroCusto,
+                         centro_lucro        AS centroLucro,
+                         desc_cc             AS descCC,
+                         usuario_responsavel AS usuarioResponsavel
+                  FROM cc
+                `);
+                DEPARA_GLB = linhas(currentDb, `
+                  SELECT legado, atual,
+                         tipologia_cc   AS tipologiaCC,
+                         desc_tipologia AS descTipologia,
+                         up,
+                         desc_up        AS descUP,
+                         tipo_contrato  AS tipoContrato,
+                         forma_controle AS formaControle,
+                         tipo_bem       AS tipoBem,
+                         unid_medida    AS unidMedida
+                  FROM depara
+                `);
+                this.estado = 'app';
               } catch (e) {
-                this.loginErro = 'Erro ao verificar credenciais.';
+                this.loginErro = 'Erro de conexão com o servidor.';
               } finally {
                 this.loginProcessando = false;
               }
