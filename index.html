@@ -3,58 +3,499 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>APP Classe IMO</title>
-  <link rel="stylesheet" href="css/style.css">
+  <title>Definir a Classe do Ativo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            sabesp: { cyan: '#00b4d8', navy: '#1a3a5c', dark: '#1D4166' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    [v-cloak] { display: none; }
+
+    .input-yellow {
+      background: #fefce8;
+      border: 1.5px solid #1D4166;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .input-yellow:focus {
+      outline: none;
+      border-color: #00b4d8;
+      box-shadow: 0 0 0 3px rgba(0, 180, 216, 0.2);
+    }
+    .input-yellow::placeholder {
+      color: #94a3b8;
+      font-weight: 400;
+    }
+
+    .ca-box {
+      background: #1a4a6e;
+      border: 3px solid #ffd700;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .ca-box.incompativel {
+      background: #7b1a1a;
+      border-color: #c0392b;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .fade-up { animation: fadeUp 0.25s ease-out; }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .spinner {
+      width: 44px; height: 44px;
+      border: 4px solid #e2e8f0;
+      border-top-color: #00b4d8;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    .btn-primary {
+      background: linear-gradient(to bottom, #1e3a5f, #1a3a5c);
+      color: #fde047;
+      border: none;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+      transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
+    }
+    .btn-primary:hover {
+      background: linear-gradient(to bottom, #24486e, #1e3a5f);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.30);
+    }
+    .btn-primary:active { transform: translateY(2px); box-shadow: 0 1px 4px rgba(0,0,0,0.2); }
+
+    .btn-secondary {
+      background: #00b4d8;
+      color: #ffffff;
+      border: none;
+      box-shadow: 0 2px 8px rgba(0,180,216,0.30);
+      transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
+    }
+    .btn-secondary:hover {
+      background: #0096b5;
+      box-shadow: 0 4px 12px rgba(0,180,216,0.35);
+    }
+    .btn-secondary:active { transform: translateY(2px); box-shadow: 0 1px 4px rgba(0,0,0,0.15); }
+  </style>
 </head>
-<body>
-  <div class="container">
-    <header class="header">
-      <h1>Classificação de Ativo Imobilizado</h1>
-      <p class="subtitle">Determina a Classe do Ativo a partir da UAR e Centro de Custo</p>
-    </header>
-    <main class="form-card">
-      <section class="form-section">
-        <h2>Dados de Entrada</h2>
-        <div class="field-group">
-          <label for="uar-input">UAR (Unidade de Adição e Retirada)</label>
-          <input type="text" id="uar-input" list="uar-list" placeholder="Digite ou cole o código da UAR..." autocomplete="off" />
-          <datalist id="uar-list"></datalist>
-          <span class="field-hint" id="uar-desc"></span>
-        </div>
-        <div class="field-group">
-          <label for="cc-input">Centro de Custo Solicitante</label>
-          <input type="text" id="cc-input" list="cc-list" placeholder="Digite ou cole o Centro de Custo..." autocomplete="off" />
-          <datalist id="cc-list"></datalist>
-          <span class="field-hint" id="cc-desc"></span>
-        </div>
-        <button id="btn-calcular" type="button">Determinar Classe</button>
-      </section>
-      <section class="result-section" id="result-section" style="display:none">
-        <h2>Resultado</h2>
-        <div id="result-incompativel" class="alert alert-error" style="display:none">
-          <strong>UAR Incompatível com o Centro de Custo</strong>
-        </div>
-        <div id="result-grid">
-          <div class="result-item"><span class="result-label">Classe do Ativo (CA)</span><span class="result-value" id="res-ca">—</span></div>
-          <div class="result-item"><span class="result-label">Descrição da Classe</span><span class="result-value" id="res-descup">—</span></div>
-          <div class="result-item"><span class="result-label">UAR selecionada</span><span class="result-value" id="res-uar">—</span></div>
-          <div class="result-item"><span class="result-label">Descrição da UAR</span><span class="result-value" id="res-descuar">—</span></div>
-          <div class="result-item"><span class="result-label">Família (UP)</span><span class="result-value" id="res-up">—</span></div>
-          <div class="result-item"><span class="result-label">Centro de Custo</span><span class="result-value" id="res-cc">—</span></div>
-          <div class="result-item"><span class="result-label">Descrição CC</span><span class="result-value" id="res-desccc">—</span></div>
-          <div class="result-item"><span class="result-label">Classificação (CL)</span><span class="result-value" id="res-cl">—</span></div>
-          <div class="result-item"><span class="result-label">Tipo Contrato (TC)</span><span class="result-value" id="res-tc">—</span></div>
-          <div class="result-item"><span class="result-label">Forma de Controle (FC)</span><span class="result-value" id="res-fc">—</span></div>
-          <div class="result-item"><span class="result-label">Tipo de Bem (GB)</span><span class="result-value" id="res-gb">—</span></div>
-          <div class="result-item"><span class="result-label">Unidade de Medida (UM)</span><span class="result-value" id="res-um">—</span></div>
-          <div class="result-item"><span class="result-label">Responsável (NomeAprov)</span><span class="result-value" id="res-nomeaprov">—</span></div>
-          <div class="result-item"><span class="result-label">Matrícula (Mat)</span><span class="result-value" id="res-mat">—</span></div>
-        </div>
-      </section>
-    </main>
+
+<body class="min-h-screen bg-slate-200 flex items-center justify-center p-6 font-sans">
+
+  <!-- Loading: visível enquanto o banco SQLite é carregado -->
+  <div id="loading" style="display:none; position:fixed; inset:0; background:rgba(240,244,248,0.95); z-index:200;
+                            flex-direction:column; align-items:center; justify-content:center; gap:14px;">
+    <div class="spinner"></div>
+    <p style="font-family:sans-serif; font-size:0.875rem; color:#475569; font-weight:600; letter-spacing:0.03em;">
+      Carregando banco de dados…
+    </p>
   </div>
-  <script src="js/data.js"></script>
+
+  <div id="app" v-cloak class="w-full max-w-3xl">
+
+    <!-- ── Card principal ── -->
+    <div class="relative bg-white border-4 border-sabesp-cyan rounded shadow-xl overflow-hidden">
+
+      <!-- HEADER: logo + título + GAC + elemento decorativo -->
+      <header class="relative flex items-center bg-white overflow-hidden border-b border-slate-100"
+              style="height:72px;">
+        <!-- Logo: contido no header -->
+        <div class="flex-shrink-0 h-full flex items-center px-3 z-10">
+          <img src="logopng.png" alt="Logo Sabesp" class="h-12 w-auto object-contain">
+        </div>
+        <!-- Título + GAC: absolutamente centrados sobre toda a largura -->
+        <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+          <h1 class="text-2xl font-black tracking-tight leading-tight" style="color:#00b4d8">
+            Definir a Classe do Ativo
+          </h1>
+          <p class="text-xs font-bold uppercase mt-1" style="color:#00b4d8; letter-spacing:0.09em;">
+            GAC: Conformidade de Ativos Regulatórios
+          </p>
+        </div>
+        <!-- Imagem decorativa: empurrada para a direita -->
+        <div class="flex-shrink-0 self-stretch overflow-hidden ml-auto">
+          <img src="imgemsuperiordireita.jpg" alt="" class="h-full w-auto block">
+        </div>
+      </header>
+
+      <!-- ALERTA INCOMPATÍVEL -->
+      <transition name="slide">
+        <div v-if="isIncompat"
+             class="flex items-center gap-2 px-4 py-2 bg-red-50 border-b-2 border-red-500 text-red-600 font-bold text-sm fade-up">
+          <span class="text-base">⚠</span>
+          <span>UAR Incompatível com o Centro de Custo</span>
+        </div>
+      </transition>
+
+      <!-- CORPO -->
+      <div>
+
+        <!-- ── Seção 1: Entradas ── -->
+        <section class="px-4 pb-3 pt-4 space-y-2 border-b-2 border-sabesp-navy">
+
+          <!-- Centro de Custo -->
+          <div class="grid items-center gap-2" style="grid-template-columns:180px 155px 1fr">
+            <label class="text-sm font-bold text-slate-800">Centro de Custo:</label>
+            <div>
+              <input type="text" v-model="ccInput" list="cc-list"
+                     autocomplete="off" placeholder="Cole ou digite o CC..."
+                     @input="onCCInput"
+                     class="input-yellow w-full px-2 py-1.5 text-sm font-bold text-sabesp-dark rounded text-center" />
+              <datalist id="cc-list">
+                <option v-for="c in CC_DATA" :key="c.cc" :value="c.cc" :label="c.cc + ' – ' + c.descCC"></option>
+              </datalist>
+            </div>
+            <span class="text-sm font-bold truncate pl-1" style="color:#00B4D8">{{ ccDesc }}</span>
+          </div>
+
+          <!-- UAR -->
+          <div class="grid items-center gap-2" style="grid-template-columns:180px 155px 1fr">
+            <label class="text-sm font-bold text-slate-800">UAR:</label>
+            <div>
+              <input type="text" v-model="uarInput" list="uar-list"
+                     autocomplete="off" placeholder="Cole ou digite a UAR..."
+                     @input="onUARInput"
+                     class="input-yellow w-full px-2 py-1.5 text-sm font-bold text-sabesp-dark rounded text-center" />
+              <datalist id="uar-list">
+                <option v-for="u in UAR_DATA" :key="u.code" :value="u.code" :label="u.code + ' – ' + u.desc"></option>
+              </datalist>
+            </div>
+            <span class="text-sm font-bold truncate pl-1" style="color:#00B4D8">{{ uarDesc }}</span>
+          </div>
+
+          <!-- Tipo de Contrato — valor centralizado na mesma largura do campo UAR (155px) -->
+          <div class="grid items-center gap-2" style="grid-template-columns:180px 155px 1fr">
+            <span class="text-sm font-bold text-slate-800">Tipo de Contrato:</span>
+            <div class="text-sm font-bold text-center" :style="{color: isIncompat ? '#c0392b' : '#00B4D8'}">{{ val(resultado, 'tc') }}</div>
+            <span class="text-sm font-bold pl-1" :style="{color: isIncompat ? '#c0392b' : '#00B4D8'}">{{ val(resultado, 'descTC') }}</span>
+          </div>
+
+          <!-- Tipo Centro Custo -->
+          <div class="grid items-center gap-2" style="grid-template-columns:180px 155px 1fr">
+            <span class="text-sm font-bold text-slate-800">Tipo Centro Custo:</span>
+            <div class="text-sm font-bold text-center" :style="{color: isIncompat ? '#c0392b' : '#00B4D8'}">{{ val(resultado, 'tcc') }}</div>
+            <span class="text-sm font-bold pl-1" :style="{color: isIncompat ? '#c0392b' : '#00B4D8'}">{{ val(resultado, 'descTCC') }}</span>
+          </div>
+
+          <!-- Centro de Lucro -->
+          <div class="grid items-center gap-2" style="grid-template-columns:180px 155px 1fr">
+            <span class="text-sm font-bold text-slate-800">Centro de Lucro:</span>
+            <div class="text-sm font-bold text-center" :style="{color: isIncompat ? '#c0392b' : '#00B4D8'}">{{ val(resultado, 'cl') }}</div>
+            <span class="text-sm font-bold pl-1" :style="{color: isIncompat ? '#c0392b' : '#00B4D8'}">{{ val(resultado, 'descCL') }}</span>
+          </div>
+
+          <!-- Botões -->
+          <div class="flex gap-3 pt-2">
+            <button @click="determinar"
+                    class="btn-primary font-bold text-sm uppercase tracking-wider px-7 py-2 rounded cursor-pointer">
+              Determinar Classe
+            </button>
+            <button @click="limpar"
+                    class="btn-secondary font-bold text-sm uppercase tracking-wider px-7 py-2 rounded cursor-pointer">
+              Limpar
+            </button>
+          </div>
+        </section>
+
+        <!-- ── Seção 2: FC / Grupo de Bens / UM ── -->
+        <!-- FC = 30%: borda esq. do GB alinha com borda dir. do CA (ambos em 30%) -->
+        <section class="grid border-b-2 border-sabesp-navy" style="grid-template-columns:30% 1fr 1fr">
+          <div class="border-r border-slate-200">
+            <div class="text-xs font-bold text-slate-600 text-center py-2 border-b border-slate-200 bg-slate-50 uppercase tracking-wide">
+              Forma de Controle
+            </div>
+            <div class="text-sm font-bold text-center py-3" :style="{color: isIncompat ? '#c0392b' : '#00B4D8'}">
+              {{ resultado ? (resultado.fc || '') : '' }}
+            </div>
+          </div>
+          <div class="border-r border-slate-200">
+            <div class="text-xs font-bold text-slate-600 text-center py-2 border-b border-slate-200 bg-slate-50 uppercase tracking-wide">
+              Grupo de Bens
+            </div>
+            <div class="text-sm font-bold text-center py-3" :style="{color: isIncompat ? '#c0392b' : '#00B4D8'}">
+              {{ resultado ? (resultado.gb || '') : '' }}
+            </div>
+          </div>
+          <div>
+            <div class="text-xs font-bold text-slate-600 text-center py-2 border-b border-slate-200 bg-slate-50 uppercase tracking-wide">
+              Unidade de Medida
+            </div>
+            <div class="text-sm font-bold text-center py-3" :style="{color: isIncompat ? '#c0392b' : '#00B4D8'}">
+              {{ resultado ? (resultado.um || '') : '' }}
+            </div>
+          </div>
+        </section>
+
+        <!-- ── Seção 3: Classe do Ativo ── -->
+        <section class="grid border-b-2 border-sabesp-navy" style="grid-template-columns:30% 70%">
+          <div class="border-r border-slate-200 flex flex-col">
+            <div class="text-xs font-bold text-slate-600 text-center py-2 border-b border-slate-200 bg-slate-50 uppercase tracking-wide">
+              Classe do Ativo
+            </div>
+            <div class="flex-1 flex items-center justify-center p-3">
+              <div :class="['ca-box rounded w-full flex items-center justify-center px-3 py-3 min-h-[52px]',
+                            isIncompat ? 'incompativel' : '']">
+                <span :class="['font-black text-lg tracking-wide', isIncompat ? 'text-red-200' : 'text-yellow-300']">
+                  {{ resultado ? (resultado.ca || '') : '' }}
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="flex flex-col">
+            <div class="text-xs font-bold text-slate-600 text-center py-2 border-b border-slate-200 bg-slate-50 uppercase tracking-wide">
+              Descrição Classe do Ativo Imobilizado
+            </div>
+            <div class="flex-1 flex items-center px-5 py-3 text-sm font-bold leading-snug"
+                 :style="{color: isIncompat ? '#c0392b' : '#00B4D8'}">
+              {{ resultado ? (resultado.descUP || '') : '' }}
+            </div>
+          </div>
+        </section>
+
+        <!-- ── Seção 4: Rodapé ── -->
+        <section class="grid relative" style="grid-template-columns:30% 1fr; min-height:72px">
+          <div class="flex items-center justify-center border-r border-slate-200">
+            <span @click="abrirAjuda"
+                  @keydown.enter="abrirAjuda"
+                  @keydown.space.prevent="abrirAjuda"
+                  tabindex="0" role="button"
+                  class="font-bold text-base cursor-pointer underline underline-offset-2 transition-colors"
+                  style="color:#00b4d8"
+                  onmouseover="this.style.color='#0077b6'"
+                  onmouseout="this.style.color='#00b4d8'">
+              Ajuda
+            </span>
+          </div>
+          <div class="grid" style="grid-template-columns:1fr 1fr; grid-template-rows:auto 1fr">
+            <div class="text-xs font-bold text-slate-600 text-center py-2 border-b border-r border-slate-200 bg-slate-50 uppercase tracking-wide">
+              Matrícula
+            </div>
+            <div class="text-xs font-bold text-slate-600 text-center py-2 border-b border-slate-200 bg-slate-50 uppercase tracking-wide">
+              Nome do Aprovador
+            </div>
+            <div class="text-sm font-bold text-center flex items-center justify-center border-r border-slate-200 py-2 px-2"
+                 :style="{color: isIncompat ? '#c0392b' : '#00B4D8'}">
+              {{ resultado ? (resultado.mat || '') : '' }}
+            </div>
+            <div class="text-sm font-bold text-center flex items-center justify-center py-2 px-2"
+                 :style="{color: isIncompat ? '#c0392b' : '#00B4D8'}">
+              {{ resultado ? (resultado.nomeAprov || '') : '' }}
+            </div>
+          </div>
+          <!-- Logo rodapé -->
+          <div class="absolute bottom-2 right-2 opacity-25">
+            <img src="logopng.png" alt="" class="w-7 h-7 object-contain">
+          </div>
+        </section>
+
+      </div><!-- /corpo -->
+    </div><!-- /card -->
+
+    <!-- ── MODAL DE AJUDA ── -->
+    <div v-if="showModal"
+         class="fixed inset-0 z-50 flex items-center justify-center"
+         role="dialog" aria-modal="true" aria-labelledby="modal-titulo">
+      <div @click="fecharAjuda" class="absolute inset-0 bg-black/50"></div>
+      <div class="relative bg-white border-4 border-sabesp-cyan rounded shadow-2xl max-w-lg w-11/12 overflow-hidden fade-up">
+        <div class="flex items-center justify-between px-4 py-3 border-b-2 border-sabesp-navy bg-slate-50">
+          <span id="modal-titulo" class="font-black text-sm text-sabesp-dark">
+            Como Determinar a Classe do Ativo — Passo a Passo
+          </span>
+          <button @click="fecharAjuda"
+                  class="text-2xl leading-none text-slate-500 hover:text-red-600 transition-colors cursor-pointer bg-transparent border-none">
+            &times;
+          </button>
+        </div>
+        <ol class="list-decimal px-8 py-5 space-y-3 max-h-96 overflow-y-auto">
+          <li class="text-sm text-slate-700 leading-relaxed">
+            <strong class="text-sabesp-dark">Informe o Centro de Custo (CC):</strong>
+            Cole ou selecione na lista suspensa o código do CC do solicitante. A descrição aparece automaticamente à direita do campo.
+          </li>
+          <li class="text-sm text-slate-700 leading-relaxed">
+            <strong class="text-sabesp-dark">Informe a UAR:</strong>
+            Cole ou selecione da lista a Unidade de Adição e Retirada do ativo.
+            Os campos <em class="font-bold not-italic text-red-600">TC</em>, <em class="font-bold not-italic text-red-600">TCC</em> e <em class="font-bold not-italic text-red-600">CL</em> são preenchidos automaticamente.
+          </li>
+          <li class="text-sm text-slate-700 leading-relaxed">
+            <strong class="text-sabesp-dark">Clique em "Determinar Classe":</strong>
+            O sistema aplica os critérios e exibe a Classe do Ativo (CA), Forma de Controle (FC), Grupo de Bens (GB) e Unidade de Medida (UM).
+          </li>
+          <li class="text-sm text-slate-700 leading-relaxed">
+            <strong class="text-sabesp-dark">Interprete o resultado:</strong>
+            O campo <em class="font-bold not-italic text-red-600">CA</em> (em destaque) mostra a classe definida.
+            A coluna à direita exibe a descrição completa.
+          </li>
+          <li class="text-sm text-slate-700 leading-relaxed">
+            <strong class="text-sabesp-dark">Atenção — resultado "Incompatível":</strong>
+            A UAR informada não é compatível com o Centro de Custo selecionado. Revise os dois campos e refaça a classificação.
+          </li>
+          <li class="text-sm text-slate-700 leading-relaxed">
+            <strong class="text-sabesp-dark">Nova consulta — botão "Limpar":</strong>
+            Clique em Limpar para apagar todos os campos e retornar ao estado inicial.
+          </li>
+        </ol>
+      </div>
+    </div>
+
+  </div><!-- /app -->
+
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.2/sql-wasm.js"></script>
   <script src="js/logic.js"></script>
-  <script src="js/app.js"></script>
+  <script>
+    const { createApp } = Vue;
+
+    // ── Carrega o banco SQLite e retorna as 3 tabelas como arrays de objetos ──
+    async function carregarBanco() {
+      const SQL = await initSqlJs({
+        locateFile: f => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.2/${f}`
+      });
+
+      const resp = await fetch('db/classes_imo.db');
+      if (!resp.ok) throw new Error(`Banco não encontrado (HTTP ${resp.status})`);
+
+      const buf = await resp.arrayBuffer();
+      const db  = new SQL.Database(new Uint8Array(buf));
+
+      // Converte resultado SQL → array de objetos JS
+      function linhas(sql) {
+        const r = db.exec(sql);
+        if (!r.length) return [];
+        const { columns, values } = r[0];
+        return values.map(row =>
+          Object.fromEntries(columns.map((col, i) => [col, row[i]]))
+        );
+      }
+
+      const UAR_DATA = linhas(
+        'SELECT code, desc FROM uar ORDER BY code'
+      );
+
+      const CC_DATA = linhas(`
+        SELECT cc,
+               responsavel,
+               tipo_contrato       AS tipoContrato,
+               tipo_centro_custo   AS tipoCentroCusto,
+               centro_lucro        AS centroLucro,
+               desc_cc             AS descCC,
+               usuario_responsavel AS usuarioResponsavel
+        FROM cc
+      `);
+
+      const DEPARA_DATA = linhas(`
+        SELECT legado, atual,
+               tipologia_cc   AS tipologiaCC,
+               desc_tipologia AS descTipologia,
+               up,
+               desc_up        AS descUP,
+               tipo_contrato  AS tipoContrato,
+               forma_controle AS formaControle,
+               tipo_bem       AS tipoBem,
+               unid_medida    AS unidMedida
+        FROM depara
+      `);
+
+      db.close();
+      return { UAR_DATA, CC_DATA, DEPARA_DATA };
+    }
+
+    // ── Exibe spinner e inicia carregamento ───────────────────────────────────
+    document.getElementById('loading').style.display = 'flex';
+
+    carregarBanco()
+      .then(({ UAR_DATA, CC_DATA, DEPARA_DATA }) => {
+
+        document.getElementById('loading').style.display = 'none';
+
+        // ── Monta o app Vue após os dados estarem prontos ─────────────────────
+        createApp({
+          data() {
+            return {
+              CC_DATA,
+              UAR_DATA,
+              ccInput:   '',
+              uarInput:  '',
+              ccDesc:    '',
+              uarDesc:   '',
+              resultado: null,
+              showModal: false,
+            };
+          },
+          computed: {
+            isIncompat() {
+              return this.resultado && this.resultado.ca === 'Incompatível';
+            },
+          },
+          methods: {
+            val(r, field) {
+              return r ? (r[field] || '') : '';
+            },
+            onCCInput() {
+              const v = this.ccInput.trim();
+              if (!v) { this.ccDesc = ''; return; }
+              const found = CC_DATA.find(c => c.cc === v);
+              this.ccDesc = found ? found.descCC : 'CC não encontrado';
+            },
+            onUARInput() {
+              const v = this.uarInput.trim();
+              if (!v) { this.uarDesc = ''; return; }
+              const f = formatUAR(v);
+              const found = UAR_DATA.find(u => u.code === f);
+              this.uarDesc = found ? found.desc : 'UAR não encontrada';
+            },
+            determinar() {
+              const uarVal = this.uarInput.trim();
+              const ccVal  = this.ccInput.trim();
+              if (!uarVal || !ccVal) {
+                alert('Preencha a UAR e o Centro de Custo antes de continuar.');
+                return;
+              }
+              this.resultado = calcularClasse(uarVal, ccVal, UAR_DATA, CC_DATA, DEPARA_DATA);
+              const cc  = CC_DATA.find(c => c.cc === ccVal);
+              this.ccDesc  = cc  ? cc.descCC   : this.ccDesc;
+              const uar = UAR_DATA.find(u => u.code === formatUAR(uarVal));
+              this.uarDesc = uar ? uar.desc     : this.uarDesc;
+            },
+            limpar() {
+              this.ccInput   = '';
+              this.uarInput  = '';
+              this.ccDesc    = '';
+              this.uarDesc   = '';
+              this.resultado = null;
+              this.$nextTick(() => document.querySelector('#app input').focus());
+            },
+            abrirAjuda()  { this.showModal = true;  },
+            fecharAjuda() { this.showModal = false; },
+          },
+          mounted() {
+            document.addEventListener('keydown', e => {
+              if (e.key === 'Escape') this.fecharAjuda();
+            });
+          },
+        }).mount('#app');
+
+      })
+      .catch(err => {
+        const el = document.getElementById('loading');
+        el.innerHTML = `
+          <p style="font-family:sans-serif;color:#c0392b;font-weight:700;text-align:center;padding:24px;">
+            Erro ao carregar o banco de dados:<br>
+            <span style="font-weight:400;font-size:0.85rem;">${err.message}</span><br><br>
+            <span style="font-size:0.8rem;color:#64748b;">
+              Execute: <code>python scripts/xlsx_to_sqlite.py</code><br>
+              e recarregue a página.
+            </span>
+          </p>`;
+      });
+  </script>
 </body>
 </html>
