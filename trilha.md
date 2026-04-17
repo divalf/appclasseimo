@@ -274,3 +274,59 @@ const CREDENCIAIS = { admin: 'sabesp@2025' };
 ```
 
 As mesmas mudanças foram replicadas em `admin.html`.
+
+---
+
+## 14. Correção de Senha Incorreta no Admin (2026-04-17)
+
+**Problema:** login no `admin.html` retornava "senha incorreta" em produção.
+
+**Causa:** o volume Docker é inicializado apenas na primeira vez. Se o container foi criado antes da tabela `users` ser adicionada ao seed, o banco em produção não tinha usuários. Além disso, um bug anterior no endpoint `change-password` (escrita no caminho errado) corrompeu senhas de usuários que tentaram alterá-las.
+
+### Correções aplicadas
+
+1. `entrypoint.sh` — `INSERT OR IGNORE` dos usuários do seed a cada inicialização, garantindo existência mesmo em volumes antigos.
+2. `server.js` — novo endpoint `POST /api/reset-users` (requer header `X-Reset-Token`) para reset de emergência.
+3. `docker-compose.yml` — variável `RESET_TOKEN` adicionada.
+
+---
+
+## 15. Hardening de Segurança (2026-04-17)
+
+Code review identificou três vulnerabilidades. Todas corrigidas.
+
+### Issue 1 — Senha inicial exposta no código e na resposta da API
+
+`SENHA_INICIAL` movida de hardcode para `process.env.SENHA_INICIAL`. Campo `senhaInicial` removido do JSON de resposta do `/api/reset-users`.
+
+### Issue 2 — Credenciais de usuários no banco público
+
+**Problema crítico:** `classes_imo.db` era servido publicamente (necessário para o app funcionar) e continha a tabela `users` com hashes de senha. Qualquer pessoa podia baixar o arquivo e inspecionar os hashes.
+
+**Solução:** autenticação migrada para banco separado `auth.db`, que nunca é exposto via rota HTTP.
+
+| Arquivo | Responsabilidade |
+|---|---|
+| `classes_imo.db` | Dados públicos (UAR, CC, DEPARA) — servido via `GET /db/classes_imo.db` |
+| `auth.db` | Usuários e senhas — somente acessível pelo servidor Node.js |
+
+**Mudanças:**
+- `server.js`: rota `/db` substituída por rota explícita `GET /db/classes_imo.db`; novo `AUTH_DB_PATH`; todos os endpoints de auth usam `auth.db`; novo `POST /api/login`.
+- `entrypoint.sh`: cria/popula `auth.db` a cada inicialização (sem tocar em `classes_imo.db`).
+- `admin.html`: método `autenticar()` migrado de consulta sql.js para `POST /api/login`.
+
+### Issue 3 — `RESET_TOKEN` hardcoded no git
+
+`docker-compose.yml` não contém mais credenciais. `RESET_TOKEN` e `SENHA_INICIAL` devem ser configurados no painel do EasyPanel → Environment.
+
+### Issue 4 — `Dockerfile` com `COPY --exclude` incompatível
+
+`COPY --exclude=db . .` requer BuildKit recente — falhou no EasyPanel. Substituído por `COPY . .` seguido de `RUN rm -rf /app/db`, compatível com qualquer versão.
+
+### Fluxo de autenticação após refatoração
+
+```
+admin.html → POST /api/login (username + password plaintext via HTTPS)
+           → server.js: sha256(password) comparado com auth.db
+           → { ok: true, nome: '...' }  ou  { error: '...' }
+```
