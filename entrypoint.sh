@@ -4,10 +4,23 @@ set -e
 mkdir -p /app/db
 
 # ── classes_imo.db: banco de dados público ────────────────────────────────────
+# O seed da imagem é sempre a verdade: este banco é dado público gerado do xlsx
+# (uar/cc/depara) e ninguém o escreve em runtime — server.js só faz sendFile.
+# Sem o ramo de atualização abaixo, o arquivo do volume venceria para sempre e
+# toda regeneração do banco pareceria "não ter subido" em produção.
+# O auth.db não é tocado aqui: é criado adiante e vive só no volume.
 if [ ! -f /app/db/classes_imo.db ]; then
   echo "[init] classes_imo.db não encontrado — copiando seed..."
   cp /db-seed/classes_imo.db /app/db/classes_imo.db
   echo "[init] classes_imo.db inicializado."
+# O teste de `cmp` é condicional de propósito: se o binário não existir na imagem,
+# cai no ramo de cópia em vez de abortar por `set -e`. Copiar é sempre seguro.
+elif command -v cmp >/dev/null 2>&1 && cmp -s /db-seed/classes_imo.db /app/db/classes_imo.db; then
+  echo "[init] classes_imo.db já corresponde ao seed desta imagem."
+else
+  echo "[init] atualizando classes_imo.db a partir do seed..."
+  cp /db-seed/classes_imo.db /app/db/classes_imo.db
+  echo "[init] classes_imo.db atualizado."
 fi
 
 # ── auth.db: banco de autenticação (nunca servido publicamente) ───────────────
