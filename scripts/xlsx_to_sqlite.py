@@ -16,21 +16,15 @@ Após rodar:
 """
 
 import sqlite3
-import hashlib
 import openpyxl
 import os
 import sys
 
-# ── Administradores ────────────────────────────────────────────────────────────
-USUARIOS = [
-    ('jafagundes', 'Jorge Fagundes'),
-    ('jmartinez',  'Jorge Martinez'),
-    ('pnishiyama', 'Patrick Nishiyama'),
-    ('gmfranco',   'Gildásio Macedo'),
-    ('dfilho',     'Dival S Filho'),
-]
-SENHA_INICIAL = 'SabespS42026'
-SENHA_HASH    = hashlib.sha256(SENHA_INICIAL.encode()).hexdigest()
+# NOTA DE SEGURANÇA
+# Este banco é servido publicamente (GET /db/classes_imo.db) e por isso contém
+# APENAS dados públicos (UAR / CC / DEPARA). Usuários e hashes de senha vivem
+# exclusivamente em db/auth.db, criado pelo entrypoint.sh (ou por
+# scripts/seed_auth_db.py no ambiente local) e nunca exposto via HTTP.
 
 # ── Caminhos ──────────────────────────────────────────────────────────────────
 BASE       = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -168,13 +162,6 @@ CREATE TABLE depara (
     unid_medida     TEXT DEFAULT ""
 );
 
--- ── Tabela de Usuários Administradores ────────────────────
-CREATE TABLE users (
-    username TEXT PRIMARY KEY,
-    password TEXT NOT NULL,
-    nome     TEXT DEFAULT ""
-);
-
 -- ── Índices para performance de busca ─────────────────────
 CREATE INDEX idx_depara_up        ON depara(up);
 CREATE INDEX idx_depara_tc        ON depara(tipo_contrato);
@@ -192,9 +179,6 @@ cur.executemany(
     dep_data
 )
 
-user_data = [(u, SENHA_HASH, n) for u, n in USUARIOS]
-cur.executemany('INSERT INTO users VALUES (?,?,?)', user_data)
-
 con.commit()
 con.close()
 
@@ -206,7 +190,7 @@ print(f'  Tamanho : {size_kb:.0f} KB')
 print(f'  uar     : {len(uar_data)} linhas')
 print(f'  cc      : {len(cc_data)} linhas')
 print(f'  depara  : {len(dep_data)} linhas')
-print(f'  users   : {len(user_data)} administradores')
+print(f'  (usuários ficam em db/auth.db — fora deste banco)')
 print(f'\nPróximos passos:')
 print(f'  git add db/classes_imo.db')
 print(f'  git commit -m "chore: atualiza banco"')

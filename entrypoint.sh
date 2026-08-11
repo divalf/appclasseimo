@@ -11,6 +11,14 @@ if [ ! -f /app/db/classes_imo.db ]; then
 fi
 
 # ── auth.db: banco de autenticação (nunca servido publicamente) ───────────────
+# Falha fechado: sem SENHA_INICIAL o container não sobe. Um padrão embutido aqui
+# vira senha pública no primeiro push — o fallback que existia neste arquivo ficou
+# legível no repositório e era a senha válida em produção.
+if [ -z "$SENHA_INICIAL" ]; then
+  echo "[init] ERRO: SENHA_INICIAL não definida — configure a variável no painel." >&2
+  exit 1
+fi
+
 echo "[init] Verificando auth.db..."
 node - <<'EOF'
 try {
@@ -34,7 +42,7 @@ try {
   ];
 
   const crypto  = require('crypto');
-  const SENHA   = process.env.SENHA_INICIAL || 'SabespS42026';
+  const SENHA   = process.env.SENHA_INICIAL;
   const hash    = crypto.createHash('sha256').update(SENHA, 'utf8').digest('hex');
 
   const insert  = db.prepare('INSERT OR IGNORE INTO users (username, password, nome) VALUES (?, ?, ?)');

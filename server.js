@@ -17,6 +17,10 @@ app.get('/db/classes_imo.db', (req, res) => {
   res.sendFile(DB_PATH);
 });
 
+// Barreira: nada mais dentro de /db é servido pelo static abaixo.
+// Sem isso, express.static(__dirname) entregaria db/auth.db (hashes de senha).
+app.use('/db', (req, res) => res.status(404).end());
+
 app.use(express.static(__dirname, { index: 'index.html' }));
 
 function sha256(text) {
@@ -84,8 +88,10 @@ app.post('/api/change-password', (req, res) => {
 });
 
 // POST /api/reset-users — requer header X-Reset-Token (variável de ambiente)
+// Sem fallback: um padrão embutido aqui vira senha pública no primeiro push.
+// A ausência da variável desabilita o endpoint (503), não abre uma senha conhecida.
 const RESET_TOKEN   = process.env.RESET_TOKEN || '';
-const SENHA_INICIAL = process.env.SENHA_INICIAL || 'SabespS42026';
+const SENHA_INICIAL = process.env.SENHA_INICIAL || '';
 const USUARIOS_SEED = [
   ['jafagundes', 'Jorge Fagundes'],
   ['jmartinez',  'Jorge Martinez'],
@@ -99,6 +105,9 @@ app.post('/api/reset-users', (req, res) => {
 
   if (!RESET_TOKEN) {
     return res.status(503).json({ error: 'Reset não configurado (RESET_TOKEN ausente).' });
+  }
+  if (!SENHA_INICIAL) {
+    return res.status(503).json({ error: 'Reset não configurado (SENHA_INICIAL ausente).' });
   }
   if (token !== RESET_TOKEN) {
     return res.status(403).json({ error: 'Token inválido.' });

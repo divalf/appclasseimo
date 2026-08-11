@@ -1,4 +1,4 @@
-##### &#x20;                               **PROJETO APP CLASSE IMO (14.04.2026)**
+#####          **PROJETO APP CLASSE IMO (14.04.2026)**
 
 
 
@@ -43,7 +43,7 @@ Critérios para definição das Classes de Imobilizado:
 
 
 * A primeira informação a ser fornecida no App, será a UAR (Unidade de Adição e Retirada), da Aba UAR, que deverá possuir lista suspensa com o conteúdo da coluna A (UAR). Este campo deverá permitir a colagem de dados;
-* Os dois primeiros dígitos de cada UAR, são chamados de UP ou Família do Ativo, exemplo UAR 0100001 TERRENO, UP = 01 e deverá ser definida, toda vez que o campo UAR é populado. 
+* Os dois primeiros dígitos de cada UAR, são chamados de UP ou Família do Ativo, exemplo UAR 0100001 TERRENO, UP = 01 e deverá ser definida, toda vez que o campo UAR é populado.
 * Com a UP (coluna E) definida , atribua o valor do campo da coluna F (Descrição) a variável DescUP e já conseguimos mapear todas as possíveis Classes na Aba DEPARA, coluna B (Para: Classe Atual).
 * Vá até a coluna B (Descrição) da Aba UAR e atribua o valor do campo a variável DescUAR, para a respectiva UAR selecionada;
 * Se a UAR for 9100300 a variável CA (Classe Ativo) será F1402000 e respectiva descrição deverá ser atribuída a variável DescUP com valor igual a "DIREITO DE USO – CPC06", se a UAR for 9100950 a variável CA (Classe Ativo) será F1404000 e respectiva descrição deverá ser atribuída a variável DescUP com valor igual a "EXTERNALIDADE", se a UAR for 9100900 a variável CA (Classe Ativo) será F1406000 e respectiva descrição deverá ser atribuída a variável DescUP com valor igual a "DIREITO DE USO – SOFTWARE" e se a UAR for 9100800 a variável CA (Classe Ativo) será F1407000 e respectiva descrição deverá ser atribuída a variável DescUP com valor igual a "INFRA ESTRUTURA PARA ENERGIZAÇÃO ELÉTRICA".
@@ -272,7 +272,43 @@ https://appclasseimo-classeimo.3d9cmf.easypanel.host/admin.html
 
 
 
+Aplicativo, MySQL, MariaDB, Postgres, Mongo, Redis, Caixa, Compose (BETA), Wordpress (ALFA)
 
+
+
+
+
+rode o git push
+
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+
+&#x20; |    Username    │         Nome            │
+
+&#x20; ├────────────┼───────────────────┤
+
+&#x20; │ jafagundes 	   | Jorge Fagundes          │
+
+&#x20; ├────────────┼───────────────────┤
+
+&#x20; │ jmartinez      │ Jorge Martinez          │
+
+&#x20; ├────────────┼───────────────────┤
+
+&#x20; │ pnishiyama     │ Patrick Nishiyama       │
+
+&#x20; ├────────────┼───────────────────┤
+
+&#x20; │ gmfranco       │ Gildásio Macedo         │
+
+&#x20; ├────────────┼───────────────────┤
+
+&#x20;
+
+&#x20;  Senha Inicial: definida pela variável de ambiente SENHA_INICIAL (nunca neste documento)
 
 
 
