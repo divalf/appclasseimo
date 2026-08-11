@@ -5,10 +5,33 @@
 # O banco gerado DEVE ser commitado — não ignorar
 !db/classes_imo.db
 
+# Banco de autenticação (hashes de senha) — NUNCA vai para o repositório
+db/auth.db
+db/*.db.bak
+
+# Cópia solta na raiz: o banco válido é só db/classes_imo.db, gerado por
+# scripts/xlsx_to_sqlite.py. Downloads do browser caem aqui e já vazaram a
+# tabela `users` para o repositório público — a barra inicial limita ao topo,
+# sem afetar db/classes_imo.db.
+/classes_imo.db
+
+# Dependências do servidor (contêm binário nativo compilado por plataforma)
+node_modules/
+
 # Test dependencies and coverage
 tests/node_modules/
 tests/coverage/
 tests/package-lock.json
+
+# Cockpit Fase1 (ferramenta local de conciliação em lote)
+cockpit/node_modules/
+cockpit/package-lock.json
+
+# Dados de produção da Fase1 (inputs e outputs) — nunca vão para o repositório.
+# Mantém só a estrutura de pastas via .gitkeep.
+ARQUIVOS SABESP/**
+!ARQUIVOS SABESP/**/
+!ARQUIVOS SABESP/**/.gitkeep
 
 # Temporary files
 *_tmp.*
@@ -16,3 +39,6 @@ layoutmodelo.png
 
 # Generated directories
 docs/
+
+# Logs dos processos gerenciados pelo pm2 (ecosystem.config.js)
+logs/
